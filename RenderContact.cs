@@ -31,31 +31,7 @@ namespace test1
         }
 
 
-        // public void RenderPage()// если ничего не отправлять по умолчанияю первую страницу выводит... Не уверен что это вообще нужно. Кто же мешает в ручную написать 1-ю страницу. Какое то повторение кода...
-        //{
-        //    Console.WriteLine("1/" + NumberPage()); // какая страница открыта
-        //    if (_dataContact.AmountOfContact() >= _numberOfLinesOnRender) //заполнена ли эта траница полностью, т.е проверяем контактов не меньше ли чем вывод нужно вывести на экран
-        //    {
-        //        _dataContact.StarnAndQuantityIssue(0, _numberOfLinesOnRender);
-        //        for(int i=0; i<_numberOfLinesOnRender; i++)
-        //        {
-        //            Console.WriteLine("----------");
-        //            Console.WriteLine(_dataContact.SequentialIssuanceOfContact());
-        //            Console.WriteLine("----------");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        _dataContact.StarnAndQuantityIssue(0, _dataContact.AmountOfContact()); //задаем что хотим выводить потоком. Тут вывод от нуля(ибо первая странциа) до конца длины контактов
-        //        for(int i=0; i<_dataContact.AmountOfContact(); i++)
-        //        {
-        //            Console.WriteLine("----------");
-        //            Console.WriteLine(_dataContact.SequentialIssuanceOfContact());
-        //            Console.WriteLine("----------");
-        //        }
-        //    }
 
-        //}
         public void RenderPage(int numberPage) //вывод определенной страницы, если число больше чем всего станиц то последнию выводит, если меньше нуля, то первую.
         {
             Console.Clear();
@@ -69,39 +45,33 @@ namespace test1
 
             if (_dataContact.AmountOfContact() >= _firstElemennt + _numberOfLinesOnRender) //заполнена ли эта траница полностью, т.е проверяем контактов не меньше ли чем вывод нужно вывести на экран
             {
-                _dataContact.StarnAndQuantityIssue(_firstElemennt, _numberOfLinesOnRender);
-                for (int i = _firstElemennt; i < _numberOfLinesOnRender + _firstElemennt; i++)
+                Contact[] contact;
+                try { contact = _dataContact.TakeContact(_firstElemennt, _numberOfLinesOnRender); }  //тут код стал более понятным для чтения, но вот обработка исключений упоролась
+                catch(Exception) { contact = new Contact[0]; contact[0] = new Contact("erroe"); }
+
+                for (int i = 0; i < contact.Length; i++)
                 {
-                    try { _contact = _dataContact.IssuingElemetnNumber(i); }
-                    catch
-                    {
-                        _contact[0] = "error elemetn";
-                        _contact[1] = "error elemetn";
-                    }
-                    // обработай исключения потом как нибудь, не будь пидором
                     Console.WriteLine("----------");
-                    Console.WriteLine(_contact[0]);
-                    Console.WriteLine(_contact[1]);
+                    Console.WriteLine(contact[i].Name);
+                    Console.WriteLine(contact[i].Phone);
                     Console.WriteLine("----------");
                 }
+                
             }
             else
             {
-                _dataContact.StarnAndQuantityIssue(_firstElemennt, _dataContact.AmountOfContact()); //задаем что хотим выводить потоком. Тут вывод от нуля(ибо первая странциа) до конца длины контактов
-                for (int i = _firstElemennt; i < _dataContact.AmountOfContact(); i++)
+                Contact[] contact;
+                try { contact = _dataContact.TakeContact(_firstElemennt, _dataContact.AmountOfContact()); }
+                catch (Exception) { contact = new Contact[0]; contact[0] = new Contact("erroe"); }
+
+                for (int i = 0; i < contact.Length; i++)
                 {
-                    try { _contact = _dataContact.IssuingElemetnNumber(i); }
-                    catch
-                    {
-                        _contact[0] = "error elemetn";
-                        _contact[1] = "error elemetn";
-                    }
-                    // 
                     Console.WriteLine("----------");
-                    Console.WriteLine(_contact[0]);
-                    Console.WriteLine(_contact[1]);
+                    Console.WriteLine(contact[i].Name);
+                    Console.WriteLine(contact[i].Phone);
                     Console.WriteLine("----------");
                 }
+
             }
         }
     }

@@ -4,67 +4,65 @@ using System.Collections.Generic;
 
 namespace test1
 {
+    public class Contact
+    {
+        public string Name { get; set; }
+        public string Phone { get; set; }
+        public Contact(string name, string phone)
+        {
+            Name = name;
+            Phone = phone;
+        }
+        public Contact(string name)
+        {
+            Name = name;
+            Phone = "none";
+        }
+    }
     class BaseDataContacts
     {
-        protected List<string> _name = new List<string>();
-        protected List<string> _phone = new List<string>();
-        private int _quantityIssue = 0; //для потоковой выдачи, сколько нужно выдать элементов
-        private int _numberIssue = 0; //какой номер элемента выдавать
+       // protected List<string> _name = new List<string>();
+        //protected List<string> _phone = new List<string>();
+        private List<Contact> _contacts;
+
+       // private int _quantityIssue = 0; //для потоковой выдачи, сколько нужно выдать элементов
+       // private int _numberIssue = 0; //какой номер элемента выдавать
 
 
         //методы добавления контактов
         public void AddContact(string name, string phone)
         {
-            _name.Add(name);
-            _phone.Add(phone);
+            _contacts.Add(new Contact(name,phone));
         }
         public void AddContact(string name) //как минимум у контакта должено быть имя
         {
-            _name.Add(name);
-            _phone.Add("none");
+            _contacts.Add(new Contact(name));
         }
-
-        //метод выдачи для полечения потоково сначало через StarnAndQuantityIssue задается с какого и сколько элементов вернуть, а потом вызываем указаное количество раз SequentialIssuanceOfContact для получение элементов //ну и велосипед я сделал блин(
-        public void StarnAndQuantityIssue(int startPosition, int quantityIssue) //определяем с какого элемента и сколько нужно выдать в дальнейшем.
+   
+        public Contact[] TakeContact(int offset, int take) //офсет - начальный элемент, тейк количество элементов
         {
-            _numberIssue = startPosition;
-            _quantityIssue = quantityIssue;
-        }
-        public string[] SequentialIssuanceOfContact() //потоковая выдача, 0- имя 1- телефон !!! короче это правальная тема какая то, убрал ее ибо не смог сделать ее устойчивой от не вверных входных данных!
-        {
-            if (_quantityIssue > 0) //
+            //валидация
+            if(offset < 0 && offset > AmountOfContact())
             {
-                string[] _outData = new string[2];
+                throw new Exception("eeror offset");
+            }
+            if(offset+take > AmountOfContact())
+            {
+                throw new Exception("eeror take");
+            }
 
-                _outData[0] = _name[_numberIssue]; //тут явно для безопасности нужно что то делать, а то все ломается легко(
-                _outData[1] = _phone[_numberIssue];
-                _quantityIssue--;
-                _numberIssue++;
-                return _outData;
-            }
-            else
+            Contact[] outContacts = new Contact[take];
+            for(int i = 0; i < take; i++)
             {
-                throw new Exception("xyi");
+                outContacts[i]=_contacts[i+offset];
             }
+            return outContacts;
         }
         public int AmountOfContact() //количество контактов в базе
         {
 
-            return _name.Count;
+            return _contacts.Count;
         }
-        public string[] IssuingElemetnNumber(int numberElement) // для простоты можно тупо запросить какой то элемент и его вызвать конкретно так !!!и тут тоже обработай исключения!!!
-        {
-            if (numberElement < _name.Count)
-            {
-                string[] _outData = new string[2];
-                _outData[0] = _name[numberElement];
-                _outData[1] = _phone[numberElement];
-                return _outData;
-            }
-            else { throw new Exception("net etogo elementa"); }
-
-        }
-
         public void TestAddContact(int length)
         {
             for (int i = 0; i < length; i++)
