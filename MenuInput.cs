@@ -8,8 +8,8 @@ namespace test1
 {
     class MenuInput
     {
-        private RenderContact _renderPageInfo;
-        private BaseDataContacts _dataContacts;
+        private readonly RenderContact _renderPageInfo;
+        private readonly BaseDataContacts _dataContacts;
         private int _currentPage = 1;
         public MenuInput(RenderContact classRenderContact, BaseDataContacts dataContacts)
         {
@@ -62,7 +62,7 @@ namespace test1
             AddContactRenderMenu();
             Console.WriteLine("ввидите имя:");
             var name = Console.ReadLine();
-            if (name == "1" || name == "")
+            if (name == "1" || string.IsNullOrWhiteSpace(name))
             {
                 return;
             }
@@ -73,7 +73,7 @@ namespace test1
             {
                 return;
             }
-            if (phone == "") // поле телефона может быть и пустым же...
+            if (string.IsNullOrWhiteSpace(phone)) // поле телефона может быть и пустым же...
             {
                 _dataContacts.AddContact(name);
             }
