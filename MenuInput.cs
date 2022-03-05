@@ -37,18 +37,18 @@ namespace test1
             {
                 case "1":
                     return NextPage();
-                    break;
+                    
 
                 case "2":
                     return PrevPage();
-                    break;
+                    
 
                 case "3":
                     AddContact();
                     break;
                 case "4":
                     return 0;
-                    break;
+                    
                 default:  //не очень понимаю к чему тут дефолт, при любых других значениях просто продолжается код после конструкции свитча же.
                     return _currentPage; 
             }
