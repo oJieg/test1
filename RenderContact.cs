@@ -8,8 +8,8 @@ namespace test1
 {
     class RenderContact
     {
-        private int _numberOfLinesOnRender; //сколько строк на одном экране
-        private BaseDataContacts _dataContact; //ссылка на БД
+        private readonly int _numberOfLinesOnRender; //сколько строк на одном экране
+        private readonly BaseDataContacts _dataContact; //ссылка на БД
         public RenderContact(BaseDataContacts data, int numberOfLinesOnRender) //в контструкторе задаем сколько строк может быть одновременно на экране и присылваем экземпляр класса зазы данных
         {
             _numberOfLinesOnRender = numberOfLinesOnRender;
@@ -61,8 +61,8 @@ namespace test1
             else
             {
                 Contact[] contact;
-                try { contact = _dataContact.TakeContact(_firstElemennt, _dataContact.AmountOfContact()); }
-                catch (Exception) { contact = new Contact[0]; contact[0] = new Contact("erroe"); }
+                try { contact = _dataContact.TakeContact(_firstElemennt, _dataContact.AmountOfContact()-_firstElemennt); }
+                catch (Exception) { contact = new Contact[1]; contact[0] = new Contact("erroe2"); }
 
                 for (int i = 0; i < contact.Length; i++)
                 {

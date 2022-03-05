@@ -36,11 +36,11 @@ namespace test1
             switch (input)
             {
                 case "1":
-                    NextPage();
+                    return NextPage();
                     break;
 
                 case "2":
-                    PrevPage();
+                    return PrevPage();
                     break;
 
                 case "3":
@@ -49,6 +49,8 @@ namespace test1
                 case "4":
                     return 0;
                     break;
+                default:  //не очень понимаю к чему тут дефолт, при любых других значениях просто продолжается код после конструкции свитча же.
+                    return _currentPage; 
             }
             return _currentPage;
 
@@ -80,20 +82,24 @@ namespace test1
                 _dataContacts.AddContact(name, phone);
             }
         }
-        private void NextPage() //это наверное излишни под такое методы делать же? или норм? 
+        private int NextPage() //это наверное излишни под такое методы делать же? или норм? 
         {
             if (_currentPage < _renderPageInfo.NumberPage())
             {
                 _currentPage++;
+                
             }
+            return _currentPage;
         }
 
-        private void PrevPage()
+        private int PrevPage()
         {
             if (_currentPage > 1)
             {
                 _currentPage--;
+                
             }
+            return _currentPage;
         }
 
     }

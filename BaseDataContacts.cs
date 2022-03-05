@@ -21,13 +21,8 @@ namespace test1
     }
     class BaseDataContacts
     {
-       // protected List<string> _name = new List<string>();
-        //protected List<string> _phone = new List<string>();
-        private List<Contact> _contacts;
 
-       // private int _quantityIssue = 0; //для потоковой выдачи, сколько нужно выдать элементов
-       // private int _numberIssue = 0; //какой номер элемента выдавать
-
+        private List<Contact> _contacts = new List<Contact>();
 
         //методы добавления контактов
         public void AddContact(string name, string phone)
@@ -39,7 +34,7 @@ namespace test1
             _contacts.Add(new Contact(name));
         }
    
-        public Contact[] TakeContact(int offset, int take) //офсет - начальный элемент, тейк количество элементов
+        public Contact[] TakeContact(int offset, int take) //офсет - начальный элемент, тейк - количество элементов
         {
             //валидация
             if(offset < 0 && offset > AmountOfContact())
@@ -63,7 +58,7 @@ namespace test1
 
             return _contacts.Count;
         }
-        public void TestAddContact(int length)
+        public void TestAddContact(int length) //в целях автоматического добавления тестовых котактов
         {
             for (int i = 0; i < length; i++)
             {
