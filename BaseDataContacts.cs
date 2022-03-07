@@ -5,10 +5,10 @@ namespace test1
 {
     public class BaseDataContacts
     {
-        private readonly List<Contact> _contacts = new List<Contact>();
+        private readonly List<Contact> _contacts = new();
 
         //методы добавления контактов
-        public void AddContact(string name, string phone)
+        public void AddContact(string name, string? phone)
         {
             if (string.IsNullOrWhiteSpace(phone))
             {
@@ -20,7 +20,8 @@ namespace test1
             }     
         }
 
-        public Contact[] TakeContact(int offset, int take) //офсет - начальный элемент, тейк - количество элементов
+        //офсет - начальный элемент, тейк - количество элементов
+        public Contact[] TakeContact(int offset, int take) 
         {
             //валидация
             if (offset < 0 && offset > AmountOfContact())

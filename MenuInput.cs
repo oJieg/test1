@@ -14,13 +14,13 @@ namespace test1
             _dataContacts = dataContacts;
         }
 
-        private void MainRenderMenu()
+        private static void MainRenderMenu()
         {
             Console.WriteLine("==========");
             Console.WriteLine("1 - след страница, 2 - предыдушая страница, 3 - добавить контакт 4 -выйти 5 - добавить тестовые контакты");
         }
 
-        private void AddContactRenderMenu()
+        private static void AddContactRenderMenu()
         {
             Console.Clear();
             Console.WriteLine("==========");
@@ -63,7 +63,7 @@ namespace test1
             AddContactRenderMenu();
             Console.WriteLine("ввидите имя:");
 
-            string name = Console.ReadLine();
+            string? name = Console.ReadLine();
             if (name == "1" || string.IsNullOrWhiteSpace(name))
             {
                 return;
@@ -72,7 +72,7 @@ namespace test1
             AddContactRenderMenu();
             Console.WriteLine("ввидите телефон");
 
-            string phone = Console.ReadLine();
+            string? phone = Console.ReadLine();
             if (phone == "1")
             {
                 return;
