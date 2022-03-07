@@ -1,6 +1,4 @@
-﻿
-
-namespace test1
+﻿namespace test1
 {
     public class Program
     {
@@ -18,9 +16,5 @@ namespace test1
             }
             while (page != 0);
         }
-
-       
-
-
     }
 }

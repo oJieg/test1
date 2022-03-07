@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace test1
 {
     public class RenderContact
@@ -16,7 +15,8 @@ namespace test1
             _dataContact = data;
         }
 
-        public int NumberPage() // сколько страниц выходит из расчета количества контактов и длины строк на экране.
+        // количество страниц выходяших из расчета количества контактов и длины строк на экране.
+        public int NumberPage() 
         {
             //int _numberPage; 
             int _amountOfContact = _dataContact.AmountOfContact(); //количество контактов в базе
@@ -26,7 +26,10 @@ namespace test1
                 {
                     return _amountOfContact / _numberOfLinesOnRender + 1;
                 }
-                else { return _amountOfContact / _numberOfLinesOnRender; }
+                else 
+                { 
+                    return _amountOfContact / _numberOfLinesOnRender; 
+                }
             }
             else { return 1; }
         }
@@ -50,31 +53,24 @@ namespace test1
             Console.WriteLine(); //пустая строка
             int firstElement = (numberPage - 1) * _numberOfLinesOnRender; //номер первого элемента на этой страницы
 
+            int take;
             //заполнена ли эта траница полностью, т.е проверяем контактов не меньше ли чем вывод нужно вывести на экран
-            if (_dataContact.AmountOfContact() >= firstElement + _numberOfLinesOnRender)                                                                    
-            {                                                                               
-
-                try
-                {
-                    RenderingContact(_dataContact.TakeContact(firstElement, _numberOfLinesOnRender));
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("error");
-                }
+            if (_dataContact.AmountOfContact() >= firstElement + _numberOfLinesOnRender)
+            {
+                take = _numberOfLinesOnRender;
             }
             else
             {
-                try 
-                {
-                    //разделил на 2 части что бы умешалось в 120 строк)
-                    RenderingContact(
-                        _dataContact.TakeContact(firstElement, _dataContact.AmountOfContact() - firstElement)); 
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("error");
-                }
+                take = _dataContact.AmountOfContact() - firstElement;
+            }
+
+            try
+            {
+                RenderingContact(_dataContact.TakeContact(firstElement, take));
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("error");
             }
         }
 

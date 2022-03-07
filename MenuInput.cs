@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace test1
 {
     public class MenuInput
@@ -58,12 +57,13 @@ namespace test1
             }
         }
 
-        private void AddContact() //добавить контакт
+        //добавить контакт
+        private void AddContact()
         {
             AddContactRenderMenu();
             Console.WriteLine("ввидите имя:");
 
-            var name = Console.ReadLine();
+            string name = Console.ReadLine();
             if (name == "1" || string.IsNullOrWhiteSpace(name))
             {
                 return;
@@ -72,7 +72,7 @@ namespace test1
             AddContactRenderMenu();
             Console.WriteLine("ввидите телефон");
 
-            var phone = Console.ReadLine();
+            string phone = Console.ReadLine();
             if (phone == "1")
             {
                 return;
@@ -86,7 +86,6 @@ namespace test1
             if (_currentPage < _renderPageInfo.NumberPage())
             {
                 _currentPage++;
-
             }
             return _currentPage;
         }
@@ -96,12 +95,12 @@ namespace test1
             if (_currentPage > 1)
             {
                 _currentPage--;
-
             }
             return _currentPage;
         }
 
-        public void TestAddContact(int length) //в целях автоматического добавления тестовых котактов
+        //в целях автоматического добавления тестовых котактов
+        public void TestAddContact(int length) 
         {
             for (int i = 0; i < length; i++)
             {

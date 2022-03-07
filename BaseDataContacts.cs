@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace test1
 {
 
@@ -43,8 +42,9 @@ namespace test1
             }
             return outContacts;
         }
-        
-        public int AmountOfContact() //количество контактов в базе
+
+        //количество контактов в базе
+        public int AmountOfContact() 
         {
             return _contacts.Count;
         }
