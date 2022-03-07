@@ -3,11 +3,8 @@ using System.Collections.Generic;
 
 namespace test1
 {
-
-
     public class BaseDataContacts
     {
-
         private readonly List<Contact> _contacts = new List<Contact>();
 
         //методы добавления контактов

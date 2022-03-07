@@ -20,18 +20,23 @@ namespace test1
         {
             //int _numberPage; 
             int _amountOfContact = _dataContact.AmountOfContact(); //количество контактов в базе
-            if (_amountOfContact / _numberOfLinesOnRender > 0)
+
+            int numberPage = _amountOfContact / _numberOfLinesOnRender;
+            if (numberPage > 0)
             {
                 if (_amountOfContact % _numberOfLinesOnRender != 0)
                 {
-                    return _amountOfContact / _numberOfLinesOnRender + 1;
+                    return numberPage + 1;
                 }
                 else 
                 { 
-                    return _amountOfContact / _numberOfLinesOnRender; 
+                    return numberPage; 
                 }
             }
-            else { return 1; }
+            else 
+            {
+                return 1; 
+            }
         }
 
         //вывод определенной страницы, если число больше чем всего станиц то последнию выводит,
