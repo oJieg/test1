@@ -79,9 +79,8 @@ namespace test1
             }
         }
 
-        private void RenderingContact(Contact[] contact)
+        private static void RenderingContact(Contact[] contact)
         {
-
             for (int i = 0; i < contact.Length; i++)
             {
                 Console.WriteLine("----------");
