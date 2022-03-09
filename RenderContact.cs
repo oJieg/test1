@@ -75,7 +75,7 @@ namespace test1
             }
             catch (Exception)
             {
-                Console.WriteLine("error");
+                Console.WriteLine("error+");
             }
         }
 

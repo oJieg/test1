@@ -104,7 +104,7 @@ namespace test1
         {
             for (int i = 0; i < length; i++)
             {
-                _dataContacts.AddContact("имя" + i, "телефон" + i);
+                _dataContacts.AddContact($"name{i}", $"phone{i}");
             }
         }
     }
