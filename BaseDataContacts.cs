@@ -7,7 +7,7 @@ namespace test1
 {
     public class BaseDataContacts
     {
-        private readonly List<Contact> _contacts = new();
+        //private readonly List<Contact> _contacts = new();
         private readonly string _nameTable;
 
         //создание дб и ее валидация в конструкторе
