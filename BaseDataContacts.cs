@@ -113,17 +113,14 @@ namespace test1
             _BDsql.Open();
             SqliteCommand comandBDsql = new();
             comandBDsql.Connection = _BDsql;
-            comandBDsql.CommandText = "select _id from Contact;";
+            comandBDsql.CommandText = "select Count(*) from Contact;";
             comandBDsql.ExecuteNonQuery();
 
             using (SqliteDataReader reader = comandBDsql.ExecuteReader())
             {
-                //я тупой, но так и не нашел какой запрос возврашает длину столбца(
-                while( reader.Read())
-                {
-                    amount++;
-                }
-                reader.Close();
+                reader.Read();
+                amount = reader.GetInt32(0);
+
             }
             _BDsql.Close();
 
