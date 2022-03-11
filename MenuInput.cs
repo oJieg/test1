@@ -77,7 +77,6 @@ namespace test1
             {
                 return;
             }
-
             _dataContacts.AddContact(name, phone); //правда он тут ругается, что есть вариант передать NULL
         }
 
