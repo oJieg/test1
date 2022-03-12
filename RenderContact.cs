@@ -68,15 +68,9 @@ namespace test1
             {
                 take = _dataContact.AmountOfContact() - firstElement;
             }
+            //теперь считаем что класс BaseDataContacts возврашает всегда что то коректное
+            RenderingContact(_dataContact.TakeContact(firstElement, take));
 
-            try
-            {
-                RenderingContact(_dataContact.TakeContact(firstElement, take));
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("error receive");
-            }
         }
 
         private static void RenderingContact(Contact[] contact)

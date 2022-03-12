@@ -19,13 +19,13 @@ namespace test1
 
         public void InitializationBD()
         {
-            if (!File.Exists($"{_nameFile}.db"))
+            if (File.Exists($"{_nameFile}.db"))
             {
-                CreateNewBDsql();
+                ValidationDB();
             }
             else
             {
-                ValidationDB();
+                CreateNewBDsql();
             }
         }
 
@@ -37,16 +37,21 @@ namespace test1
 
             SqliteCommand comandBDsql = new("select Type from sqlite_master WHERE type='table' and name='Contact';", sqlBD);
             sqlBD.Open();
-            using SqliteDataReader reader = comandBDsql.ExecuteReader();
 
-            reader.Read();
-
-            if (!(reader.HasRows && reader.GetString(0) == "table"))
+            if (comandBDsql.ExecuteScalar() == null)
             {
-                reader.Close();
                 sqlBD.Close();
                 //сюда вход только если бд некоректная, но файл есть, по этому переименуем вот так
-                File.Copy($"{_nameFile}.db", $"{_nameFile}Copy.db");
+                try
+                {
+                    File.Copy($"{_nameFile}.db", $"{_nameFile}Copy.db");
+                }
+                catch(IOException)
+                {
+                    File.Delete($"{_nameFile}Copy.db"); //если уже есть такой файл архивный удалить его.
+                }
+
+
                 CreateNewBDsql();
             }
         }
@@ -75,7 +80,19 @@ namespace test1
             commandBDsql.Parameters.Add(phoneParametr);
 
             sqlBD.Open();
-            commandBDsql.ExecuteNonQuery();
+            try
+            {
+                commandBDsql.ExecuteNonQuery();
+            }
+            catch (SqliteException)
+            {
+                //вот чего тут писать? Тупо же наверное создавать эту таблицу если состоялась эта ошибка
+                //получится же что добавление контакта чинит все))
+                InitializationBD();
+                AddContact(name, phone);
+            }
+
+
         }
 
         //офсет - начальный элемент, тейк - количество элементов
@@ -93,23 +110,29 @@ namespace test1
 
             Contact[] outContacts = new Contact[take];
 
-            //делаем закпро в бд
             using SqliteConnection sqlBD = new(_dataSourceBD);
             int exitOffset = offset + take;
             SqliteCommand comandBDsql = new($"select * from Contact WHERE _id > {offset} AND _id <= {exitOffset};", sqlBD);
-           
+
             sqlBD.Open();
-            using (SqliteDataReader reader = comandBDsql.ExecuteReader())
+            try
             {
-                if (reader.HasRows)
+                using (SqliteDataReader reader = comandBDsql.ExecuteReader())
                 {
                     for (int i = 0; reader.Read(); i++)
                     {
                         outContacts[i] = new Contact(reader.GetString(1), reader.GetString(2));
                     }
                 }
+                return outContacts;
             }
-            return outContacts;
+            catch (SqliteException)
+            {
+                Contact[] outContactsError = new Contact[1];
+                outContactsError[0] = new Contact("error file .db", "sqlBD not correct, call InitializationBD()");
+                return outContactsError;
+            }
+
         }
 
         //количество контактов в базе
@@ -119,9 +142,15 @@ namespace test1
             SqliteCommand comandBDsql = new("select Count(*) from Contact;", sqlBD);
 
             sqlBD.Open();
-            int amount = Convert.ToInt32(comandBDsql.ExecuteScalar());
-
-            return amount;
+            try
+            {
+                int amount = Convert.ToInt32(comandBDsql.ExecuteScalar());
+                return amount;
+            }
+            catch (SqliteException)
+            {
+                return 0; //в общем если ошибка по чтению бд то результат запроса количества контактов будет 0
+            }
         }
     }
 }
