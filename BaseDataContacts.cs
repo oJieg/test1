@@ -17,23 +17,11 @@ namespace test1
             _nameFile = nameTable;
         }
 
+        //проверка бд на наличие
         public void InitializationBD()
         {
-            if (File.Exists($"{_nameFile}.db"))
-            {
-                ValidationDB();
-            }
-            else
-            {
-                CreateNewBDsql();
-            }
-        }
-
-        //проверка бд на наличие
-        private void ValidationDB()
-        {
             //и тут не совсем понял с сахором, он какой то страный вариант предлагает, не уверен что равнозначный
-            using SqliteConnection sqlBD = new(_dataSourceBD);
+            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWriteCreate");
 
             SqliteCommand comandBDsql = new("select Type from sqlite_master WHERE type='table' and name='Contact';", sqlBD);
             sqlBD.Open();
@@ -52,13 +40,13 @@ namespace test1
                 }
 
 
-                CreateNewBDsql();
+                CreateNewTable();
             }
         }
 
-        private void CreateNewBDsql()
+        private void CreateNewTable()
         {
-            using SqliteConnection sqlBD = new(_dataSourceBD);
+            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWrite");
             SqliteCommand comandBDsql = new(
                 "CREATE TABLE Contact(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Name TEXT NOT NULL, Phone TEXT)", sqlBD);
 
@@ -69,7 +57,7 @@ namespace test1
         //методы добавления контактов
         public void AddContact(string name, string? phone)
         {
-            using SqliteConnection sqlBD = new(_dataSourceBD);
+            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWrite");
 
             //добавить SqliteParameter
             SqliteCommand commandBDsql = new($"INSERT INTO Contact(Name, Phone) VALUES(@name, @phone)", sqlBD);
@@ -79,9 +67,10 @@ namespace test1
             phoneParametr.IsNullable = true;
             commandBDsql.Parameters.Add(phoneParametr);
 
-            sqlBD.Open();
+            
             try
             {
+                sqlBD.Open();
                 commandBDsql.ExecuteNonQuery();
             }
             catch (SqliteException)
@@ -110,13 +99,14 @@ namespace test1
 
             Contact[] outContacts = new Contact[take];
 
-            using SqliteConnection sqlBD = new(_dataSourceBD);
+            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly");
             int exitOffset = offset + take;
             SqliteCommand comandBDsql = new($"select * from Contact WHERE _id > {offset} AND _id <= {exitOffset};", sqlBD);
 
-            sqlBD.Open();
+           
             try
             {
+                sqlBD.Open();
                 using (SqliteDataReader reader = comandBDsql.ExecuteReader())
                 {
                     for (int i = 0; reader.Read(); i++)
@@ -138,12 +128,11 @@ namespace test1
         //количество контактов в базе
         public int AmountOfContact()
         {
-            using SqliteConnection sqlBD = new(_dataSourceBD);
+            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly") ;
             SqliteCommand comandBDsql = new("select Count(*) from Contact;", sqlBD);
-
-            sqlBD.Open();
             try
             {
+                sqlBD.Open();
                 int amount = Convert.ToInt32(comandBDsql.ExecuteScalar());
                 return amount;
             }
