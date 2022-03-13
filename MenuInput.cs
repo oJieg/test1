@@ -77,7 +77,7 @@ namespace test1
             {
                 return;
             }
-            _dataContacts.AddContact(name, phone); //правда он тут ругается, что есть вариант передать NULL
+            _dataContacts.AddContact(name, phone); 
         }
 
         private int NextPage() 
