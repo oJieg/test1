@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Data;
 using Microsoft.Data.Sqlite;
 
 namespace test1
@@ -13,7 +14,7 @@ namespace test1
         //создание дб и ее валидация в конструкторе
         public BaseDataContacts(string nameTable)
         {
-           if(nameTable == null)
+            if (nameTable == null)
             {
                 throw new ArgumentNullException(nameof(nameTable));
             }
@@ -42,7 +43,7 @@ namespace test1
                 sqlBD.Close();
                 //сюда вход только если бд некоректная, но файл есть, по этому переименуем вот так
 
-                    File.Copy($"{_nameFile}.db", $"{_nameFile}Copy.db", true);
+                File.Copy($"{_nameFile}.db", $"{_nameFile}Copy.db", true);
 
                 CreateNewTable();
             }
@@ -70,7 +71,7 @@ namespace test1
             phoneParametr.IsNullable = true;
             commandBDsql.Parameters.Add(phoneParametr);
 
-            
+
             try
             {
                 sqlBD.Open();
@@ -110,7 +111,7 @@ namespace test1
                 {
                     for (int i = 0; reader.Read(); i++)
                     {
-                        outContacts[i] = new Contact((string)reader["Name"], (string)reader["Phone"]);
+                        outContacts[i] = new Contact(reader.GetString("Name"), reader.GetString("phone"));
                     }
                 }
                 corectData = true;
@@ -128,7 +129,7 @@ namespace test1
         //количество контактов в базе
         public int AmountOfContact()
         {
-            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly") ;
+            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly");
             using SqliteCommand comandBDsql = new("select Count(*) from Contact;", sqlBD);
             try
             {
