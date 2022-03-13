@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Data;
 using Microsoft.Data.Sqlite;
+using System.Text.RegularExpressions;
 
 namespace test1
 {
@@ -14,10 +15,6 @@ namespace test1
         //создание дб и ее валидация в конструкторе
         public BaseDataContacts(string nameTable)
         {
-            if (nameTable == null)
-            {
-                throw new ArgumentNullException(nameof(nameTable));
-            }
             foreach (char item in nameTable)
             {
                 if (item == '/' || item == ':' || item == '*' || item == '?' || item == '"' || item == '<' || item == '>' || item == '|')
@@ -62,18 +59,17 @@ namespace test1
         //методы добавления контактов
         public bool AddContact(string name, string? phone)
         {
-            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWrite");
-
-            //добавить SqliteParameter
-            using SqliteCommand commandBDsql = new($"INSERT INTO Contact(Name, Phone) VALUES(@name, @phone)", sqlBD);
-            commandBDsql.Parameters.Add(new("@name", name));
-            SqliteParameter phoneParametr = new("@phone", phone);
-            phoneParametr.IsNullable = true;
-            commandBDsql.Parameters.Add(phoneParametr);
-
-
             try
             {
+                using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWrite");
+
+                //добавить SqliteParameter
+                using SqliteCommand commandBDsql = new($"INSERT INTO Contact(Name, Phone) VALUES(@name, @phone)", sqlBD);
+                commandBDsql.Parameters.Add(new("@name", name));
+                SqliteParameter phoneParametr = new("@phone", phone);
+                phoneParametr.IsNullable = true;
+                commandBDsql.Parameters.Add(phoneParametr);
+
                 sqlBD.Open();
                 commandBDsql.ExecuteNonQuery();
                 return true;
@@ -82,12 +78,10 @@ namespace test1
             {
                 return false;
             }
-
-
         }
 
         //офсет - начальный элемент, тейк - количество элементов
-        public Contact[]? TakeContact(int offset, int take, out bool corectData)
+        public bool TakeContacts(int offset, int take, out Contact[]? outContacts)
         {
             //валидация
             if (offset < 0 && offset > AmountOfContact())
@@ -98,41 +92,37 @@ namespace test1
             {
                 throw new Exception("error take");
             }
-
-            Contact[] outContacts = new Contact[take];
-
-            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly");
-            using SqliteCommand comandBDsql = new($"select Name, Phone from Contact LIMIT {take} OFFSET {offset};", sqlBD);
+            outContacts = new Contact[take];
 
             try
             {
+                using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly");
+                using SqliteCommand comandBDsql = new($"select Name, Phone from Contact LIMIT {take} OFFSET {offset};", sqlBD);
+
+
                 sqlBD.Open();
-                using (SqliteDataReader reader = comandBDsql.ExecuteReader())
+                using SqliteDataReader reader = comandBDsql.ExecuteReader();
+                for (int i = 0; reader.Read(); i++)
                 {
-                    for (int i = 0; reader.Read(); i++)
-                    {
-                        outContacts[i] = new Contact(reader.GetString("Name"), reader.GetString("phone"));
-                    }
+                    outContacts[i] = new Contact(reader.GetString("Name"), reader.GetString("phone"));
                 }
-                corectData = true;
-                return outContacts;
+                return true;
+
             }
             catch (SqliteException)
             {
-
-                corectData = false;
-                return null;
+                return false;
             }
-
         }
 
         //количество контактов в базе
         public int AmountOfContact()
         {
-            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly");
-            using SqliteCommand comandBDsql = new("select Count(*) from Contact;", sqlBD);
             try
             {
+                using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly");
+                using SqliteCommand comandBDsql = new("select Count(*) from Contact;", sqlBD);
+
                 sqlBD.Open();
                 return Convert.ToInt32(comandBDsql.ExecuteScalar());
             }

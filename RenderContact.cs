@@ -69,10 +69,16 @@ namespace test1
                 take = _dataContact.AmountOfContact() - firstElement;
             }
 
-            bool corectData;
+            Contact[]? contacts;
             //теперь считаем что класс BaseDataContacts возврашает всегда что то коректное
-            RenderingContact(_dataContact.TakeContact(firstElement, take, out corectData));
-
+            if(_dataContact.TakeContacts(firstElement, take, out contacts))
+            {
+                RenderingContact(contacts);
+            }
+            else
+            {
+                Console.WriteLine("error db");
+            }
         }
 
         private static void RenderingContact(Contact[]? contact)
