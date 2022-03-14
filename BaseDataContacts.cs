@@ -16,16 +16,11 @@ namespace test1
         //создание дб и ее валидация в конструкторе
         public BaseDataContacts(string nameTable)
         {
-            foreach (char item in Path.GetInvalidFileNameChars())
-            {
-                string unikodItem = $@"\u{(int)item:x4}";
-                if (Regex.Match(nameTable, unikodItem).Success)
-                {
-                    throw new Exception($"not using {item} in name");
-                }
-            }
-            _dataSourceBD = $"Data Source={nameTable}.db";
-            _nameFile = nameTable;
+            string abs = new string(Path.GetInvalidFileNameChars());
+            Regex r = new Regex(string.Format("[{0}]", Regex.Escape(abs)));
+            _nameFile = r.Replace(nameTable, "");
+
+            _dataSourceBD = $"Data Source={_nameFile}.db";
         }
 
         //проверка бд на наличие

@@ -4,7 +4,7 @@
     {
         static void Main(string[] args)
         {
-            BaseDataContacts newBook = new("test");
+            BaseDataContacts newBook = new(@"test\|/");
             newBook.InitializationBD();
             RenderContact render = new(newBook, 4);
             MenuInput input = new(render, newBook);
