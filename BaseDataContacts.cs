@@ -4,6 +4,7 @@ using System.IO;
 using System.Data;
 using Microsoft.Data.Sqlite;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace test1
 {
@@ -15,11 +16,12 @@ namespace test1
         //создание дб и ее валидация в конструкторе
         public BaseDataContacts(string nameTable)
         {
-            foreach (char item in nameTable)
+                foreach (char item in Path.GetInvalidFileNameChars())
             {
-                if (item == '/' || item == ':' || item == '*' || item == '?' || item == '"' || item == '<' || item == '>' || item == '|')
+                string unikodItem = $@"\u{(int)item:x4}";
+                if(Regex.Match(nameTable, unikodItem).Success)
                 {
-                    throw new InvalidOperationException(nameof(nameTable));
+                    throw new Exception($"not using {item} in name");
                 }
             }
             _dataSourceBD = $"Data Source={nameTable}.db";
