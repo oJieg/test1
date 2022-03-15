@@ -16,5 +16,10 @@
             Name = name;
             Phone = "none";
         }
+
+        public override string ToString()
+        {
+            return $"{Name}\r\n-->\t{Phone}";
+        }
     }
 }
