@@ -48,7 +48,6 @@ namespace test1
             {
                 return false;
             }
-
         }
 
         private void CreateNewTable()
