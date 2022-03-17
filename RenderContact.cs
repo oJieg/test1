@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace test1
 {
@@ -9,84 +10,65 @@ namespace test1
 
         //в контструкторе задаем сколько строк может быть одновременно на экране
         //и присылваем экземпляр класса зазы данных
-        public RenderContact(BaseDataContacts data, int numberOfLinesOnRender) 
+        public RenderContact(BaseDataContacts data, int numberOfLinesOnRender)
         {
             _numberOfLinesOnRender = numberOfLinesOnRender;
             _dataContact = data;
         }
 
         // количество страниц выходяших из расчета количества контактов и длины строк на экране.
-        public int NumberPage() 
+        public int NumberPage()
         {
-            //int _numberPage; 
-            int _amountOfContact = _dataContact.AmountOfContact(); //количество контактов в базе
+            int amountOfContact = _dataContact.AmountOfContact(); //количество контактов в базе
 
-            int numberPage = _amountOfContact / _numberOfLinesOnRender;
+            int numberPage = amountOfContact / _numberOfLinesOnRender;
             if (numberPage > 0)
             {
-                if (_amountOfContact % _numberOfLinesOnRender != 0)
+                if (amountOfContact % _numberOfLinesOnRender != 0)
                 {
                     return numberPage + 1;
                 }
-                else 
-                { 
-                    return numberPage; 
+                else
+                {
+                    return numberPage;
                 }
             }
-            else 
+            else
             {
-                return 1; 
+                return 1;
             }
         }
 
         //вывод определенной страницы, если число больше чем всего станиц то последнию выводит,
         //если меньше нуля, то первую.
-        public void RenderPage(int numberPage) 
-        {                                      
+        public void RenderPage(int numberPage)
+        {
             Console.Clear();
+            int totalNumberPage = NumberPage();
+            numberPage = numberPage <= 0 ? 1 : numberPage;
+            numberPage = numberPage >= totalNumberPage ? totalNumberPage : numberPage;
 
-            if (numberPage <= 0)
-            {
-                numberPage = 1;
-            }
-            if (numberPage > NumberPage())
-            {
-                numberPage = NumberPage();
-            }
-
-            Console.WriteLine(numberPage + "/" + NumberPage()); // какая страница открыта
+            Console.WriteLine(numberPage + "/" + totalNumberPage); // какая страница открыта
             Console.WriteLine(); //пустая строка
-            int firstElement = (numberPage - 1) * _numberOfLinesOnRender; //номер первого элемента на этой страницы
+            //номер первого элемента на этой страницы
+            int firstElement = (numberPage - 1) * _numberOfLinesOnRender;
 
-            int take;
-            //заполнена ли эта траница полностью, т.е проверяем контактов не меньше ли чем вывод нужно вывести на экран
-            if (_dataContact.AmountOfContact() >= firstElement + _numberOfLinesOnRender)
+            //теперь считаем что класс BaseDataContacts возврашает всегда что то коректное
+            if (_dataContact.TakeContacts(firstElement, _numberOfLinesOnRender, out List<Contact> contacts))
             {
-                take = _numberOfLinesOnRender;
+                RenderingContact(contacts);
             }
             else
             {
-                take = _dataContact.AmountOfContact() - firstElement;
-            }
-
-            try
-            {
-                RenderingContact(_dataContact.TakeContact(firstElement, take));
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("error");
+                Console.WriteLine("error db");
             }
         }
 
-        private static void RenderingContact(Contact[] contact)
+        private static void RenderingContact(List<Contact> contact)
         {
-            for (int i = 0; i < contact.Length; i++)
+            foreach (Contact contactItem in contact)
             {
-                Console.WriteLine("----------");
-                Console.WriteLine(contact[i].Name);
-                Console.WriteLine(contact[i].Phone);
-                Console.WriteLine("----------");
+                Console.WriteLine(contactItem);
             }
         }
     }

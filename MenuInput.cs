@@ -77,8 +77,7 @@ namespace test1
             {
                 return;
             }
-
-            _dataContacts.AddContact(name, phone); //правда он тут ругается, что есть вариант передать NULL
+            _dataContacts.AddContact(name, phone); 
         }
 
         private int NextPage() 
@@ -104,7 +103,7 @@ namespace test1
         {
             for (int i = 0; i < length; i++)
             {
-                _dataContacts.AddContact("имя" + i, "телефон" + i);
+                _dataContacts.AddContact($"name{i}", $"phone{i}");
             }
         }
     }

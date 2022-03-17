@@ -1,50 +1,134 @@
-﻿using System;
+﻿using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace test1
 {
     public class BaseDataContacts
     {
-        private readonly List<Contact> _contacts = new();
+        private readonly string _dataSourceBD;
+        private readonly string _nameFile;
+
+        //создание дб и ее валидация в конструкторе
+        public BaseDataContacts(string nameTable)
+        {
+            string abs = new(Path.GetInvalidFileNameChars());
+            Regex r = new(string.Format("[{0}]", Regex.Escape(abs)));
+            _nameFile = r.Replace(nameTable, "");
+
+            _dataSourceBD = $"Data Source={_nameFile}.db";
+        }
+
+        //проверка бд на наличие
+        public bool InitializationBD()
+        {
+            try
+            {
+                using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWriteCreate");
+                using SqliteCommand comandBDsql =
+                    new("select Type from sqlite_master WHERE type='table' and name='Contact';", sqlBD);
+                sqlBD.Open();
+
+                if (comandBDsql.ExecuteScalar() == null)
+                {
+                    sqlBD.Close();
+                    //сюда вход только если бд некоректная, но файл есть, по этому переименуем вот так
+
+                    File.Copy($"{_nameFile}.db", $"{_nameFile}Copy.db", true);
+
+                    CreateNewTable();
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private void CreateNewTable()
+        {
+            using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWrite");
+            using SqliteCommand comandBDsql =
+                new("CREATE TABLE Contact(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Name TEXT NOT NULL, Phone TEXT)", sqlBD);
+
+            sqlBD.Open();
+            comandBDsql.ExecuteNonQuery();
+        }
 
         //методы добавления контактов
-        public void AddContact(string name, string? phone)
+        public bool AddContact(string name, string? phone)
         {
-            if (string.IsNullOrWhiteSpace(phone))
+            try
             {
-                _contacts.Add(new Contact(name));
+                using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWrite");
+
+                //добавить SqliteParameter
+                using SqliteCommand commandBDsql = new($"INSERT INTO Contact(Name, Phone) VALUES(@name, @phone)", sqlBD);
+                commandBDsql.Parameters.Add(new("@name", name));
+                SqliteParameter phoneParametr = new("@phone", phone);
+                phoneParametr.IsNullable = true;
+                commandBDsql.Parameters.Add(phoneParametr);
+
+                sqlBD.Open();
+                commandBDsql.ExecuteNonQuery();
+                return true;
             }
-            else
+            catch (SqliteException)
             {
-                _contacts.Add(new Contact(name, phone));
-            }     
+                return false;
+            }
         }
 
         //офсет - начальный элемент, тейк - количество элементов
-        public Contact[] TakeContact(int offset, int take) 
+        public bool TakeContacts(int offset, int take, out List<Contact> outContacts)
         {
+            outContacts = new();
             //валидация
-            if (offset < 0 && offset > AmountOfContact())
+            int amoutOfContact = AmountOfContact();
+            if (offset < 0 && offset > amoutOfContact)
             {
-                throw new Exception("error offset");
-            }
-            if (offset + take > AmountOfContact())
-            {
-                throw new Exception("error take");
+                return false;
             }
 
-            Contact[] outContacts = new Contact[take];
-            for (int i = 0; i < take; i++)
+            try
             {
-                outContacts[i] = _contacts[i + offset];
+                using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly");
+                using SqliteCommand comandBDsql = new($"select Name, Phone from Contact LIMIT {take} OFFSET {offset};", sqlBD);
+
+                sqlBD.Open();
+                using SqliteDataReader reader = comandBDsql.ExecuteReader();
+                while (reader.Read())
+                {
+                    outContacts.Add(new Contact(reader.GetString("Name"), reader.GetString("phone")));
+                }
+                return true;
             }
-            return outContacts;
+            catch (SqliteException)
+            {
+                return false;
+            }
         }
 
         //количество контактов в базе
-        public int AmountOfContact() 
+        public int AmountOfContact()
         {
-            return _contacts.Count;
+            try
+            {
+                using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly");
+                using SqliteCommand comandBDsql = new("select Count(*) from Contact;", sqlBD);
+
+                sqlBD.Open();
+                return Convert.ToInt32(comandBDsql.ExecuteScalar());
+            }
+            catch (SqliteException)
+            {
+                return 0; //если ошибка по чтению бд то результат запроса количества контактов будет 0
+            }
         }
     }
 }
