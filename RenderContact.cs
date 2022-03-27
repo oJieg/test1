@@ -6,11 +6,11 @@ namespace test1
     public class RenderContact
     {
         private readonly int _numberOfLinesOnRender; //сколько строк на одном экране
-        private readonly BaseDataContacts _dataContact; //ссылка на БД
+        private readonly IDataContactInterface _dataContact; //ссылка на БД
 
         //в контструкторе задаем сколько строк может быть одновременно на экране
         //и присылваем экземпляр класса зазы данных
-        public RenderContact(BaseDataContacts data, int numberOfLinesOnRender)
+        public RenderContact(IDataContactInterface data, int numberOfLinesOnRender)
         {
             _numberOfLinesOnRender = numberOfLinesOnRender;
             _dataContact = data;
@@ -54,7 +54,7 @@ namespace test1
             int firstElement = (numberPage - 1) * _numberOfLinesOnRender;
 
             //теперь считаем что класс BaseDataContacts возврашает всегда что то коректное
-            if (_dataContact.TakeContacts(firstElement, _numberOfLinesOnRender, out List<Contact> contacts))
+            if (_dataContact.TryTakeContacts(firstElement, _numberOfLinesOnRender, out List<Contact> contacts))
             {
                 RenderingContact(contacts);
             }

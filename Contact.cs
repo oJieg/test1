@@ -19,7 +19,7 @@
 
         public override string ToString()
         {
-            return $"{Name}\r\n-->\t{Phone}";
+            return $"{Name}-->{Phone}";
         }
     }
 }

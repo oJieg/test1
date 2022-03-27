@@ -8,24 +8,30 @@ using System.Text.RegularExpressions;
 
 namespace test1
 {
-    public class BaseDataContacts
+    /// <summary>
+    /// первым делом вызови InitializationBD
+    /// </summary>
+    public class BaseDataContactsSQL : IDataContactInterface
     {
-        private readonly string _dataSourceBD;
-        private readonly string _nameFile;
+        private string _dataSourceBD = "";
+        private string _nameFile = "";
 
-        //создание дб и ее валидация в конструкторе
-        public BaseDataContacts(string nameTable)
+        /// <summary>
+        /// nameFile - имя файла без разширения. В случаи не допустимого имени, вернет false.
+        /// </summary>
+        /// <param name="nameFile"></param>
+        /// <returns></returns>
+        public bool TryInitializationBD(string nameFile)
         {
-            string abs = new(Path.GetInvalidFileNameChars());
-            Regex r = new(string.Format("[{0}]", Regex.Escape(abs)));
-            _nameFile = r.Replace(nameTable, "");
-
+            string forbiddenSymbols = new(Path.GetInvalidFileNameChars());
+            Regex r = new(string.Format("[{0}]", Regex.Escape(forbiddenSymbols)));
+            if (r.Match(nameFile).Success)
+            {
+                return false;
+            }
             _dataSourceBD = $"Data Source={_nameFile}.db";
-        }
+            _nameFile = nameFile;
 
-        //проверка бд на наличие
-        public bool InitializationBD()
-        {
             try
             {
                 using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWriteCreate");
@@ -36,7 +42,6 @@ namespace test1
                 if (comandBDsql.ExecuteScalar() == null)
                 {
                     sqlBD.Close();
-                    //сюда вход только если бд некоректная, но файл есть, по этому переименуем вот так
 
                     File.Copy($"{_nameFile}.db", $"{_nameFile}Copy.db", true);
 
@@ -60,14 +65,12 @@ namespace test1
             comandBDsql.ExecuteNonQuery();
         }
 
-        //методы добавления контактов
-        public bool AddContact(string name, string? phone)
+        public bool TryAddContact(string name, string? phone)
         {
             try
             {
                 using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWrite");
 
-                //добавить SqliteParameter
                 using SqliteCommand commandBDsql = new($"INSERT INTO Contact(Name, Phone) VALUES(@name, @phone)", sqlBD);
                 commandBDsql.Parameters.Add(new("@name", name));
                 SqliteParameter phoneParametr = new("@phone", phone);
@@ -85,7 +88,7 @@ namespace test1
         }
 
         //офсет - начальный элемент, тейк - количество элементов
-        public bool TakeContacts(int offset, int take, out List<Contact> outContacts)
+        public bool TryTakeContacts(int offset, int take, out List<Contact> outContacts)
         {
             outContacts = new();
             //валидация
@@ -127,7 +130,7 @@ namespace test1
             }
             catch (SqliteException)
             {
-                return 0; //если ошибка по чтению бд то результат запроса количества контактов будет 0
+                return 0;
             }
         }
     }

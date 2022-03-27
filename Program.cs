@@ -1,13 +1,16 @@
-﻿namespace test1
+﻿using System.Collections.Generic;
+using System;
+
+namespace test1
 {
     public class Program
     {
         static void Main(string[] args)
         {
-            BaseDataContacts newBook = new("test1");
-            newBook.InitializationBD();
-            RenderContact render = new(newBook, 4);
-            MenuInput input = new(render, newBook);
+            IDataContactInterface contactBD = ChoiceOfRecordingMethod.InputMenuChoice();
+
+            RenderContact render = new(contactBD, 4);
+            MenuInput input = new(render, contactBD);
 
             int page = 1; //какую страницу рендерить дальше
             do
@@ -17,6 +20,5 @@
             }
             while (page != 0);
         }
-
     }
 }

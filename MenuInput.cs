@@ -5,10 +5,10 @@ namespace test1
     public class MenuInput
     {
         private readonly RenderContact _renderPageInfo;
-        private readonly BaseDataContacts _dataContacts;
+        private readonly IDataContactInterface _dataContacts;
         private int _currentPage = 1;
 
-        public MenuInput(RenderContact classRenderContact, BaseDataContacts dataContacts)
+        public MenuInput(RenderContact classRenderContact, IDataContactInterface dataContacts)
         {
             _renderPageInfo = classRenderContact;
             _dataContacts = dataContacts;
@@ -28,7 +28,7 @@ namespace test1
         }
 
         // должно возврашать какую страницу в дальнейшем рендерить. Если вернет ноль - выйти
-        public int MainInput() 
+        public int MainInput()
         {
             MainRenderMenu();
 
@@ -52,7 +52,7 @@ namespace test1
                     TestAddContact(7);
                     return _currentPage;
 
-                default:  
+                default:
                     return _currentPage;
             }
         }
@@ -77,10 +77,10 @@ namespace test1
             {
                 return;
             }
-            _dataContacts.AddContact(name, phone); 
+            _dataContacts.TryAddContact(name, phone);
         }
 
-        private int NextPage() 
+        private int NextPage()
         {
             if (_currentPage < _renderPageInfo.NumberPage())
             {
@@ -99,11 +99,11 @@ namespace test1
         }
 
         //в целях автоматического добавления тестовых котактов
-        public void TestAddContact(int length) 
+        public void TestAddContact(int length)
         {
             for (int i = 0; i < length; i++)
             {
-                _dataContacts.AddContact($"name{i}", $"phone{i}");
+                _dataContacts.TryAddContact($"name{i}", $"phone{i}");
             }
         }
     }
