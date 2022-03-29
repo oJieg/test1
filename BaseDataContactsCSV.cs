@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
 
-
 namespace test1
 {
+
     public class BaseDataContactsCSV : IDataContactInterface
     {
-        private string _nameFile = "";
+        private string _nameFile = String.Empty;
         private int _countLine = 0;
-        public bool TryInitializationBD(string nameFile)
+        private Regex _separatorChar = new("[^;]+", RegexOptions.Compiled);
+        private readonly Regex _validationSeparatorChar = new(";", RegexOptions.Compiled);
+        public bool TryInitializationDB(string nameFile)
         {
             if (File.Exists($"{nameFile}.csv"))
             {
@@ -21,21 +21,16 @@ namespace test1
                 _countLine = AmountOfContact();
                 return true;
             }
-            else
+
+            string forbiddenSymbols = new(Path.GetInvalidFileNameChars());
+            Regex r = new(string.Format("[{0}]", Regex.Escape(forbiddenSymbols)));
+            if (!r.Match(nameFile).Success)
             {
-                string forbiddenSymbols = new(Path.GetInvalidFileNameChars());
-                Regex r = new(string.Format("[{0}]", Regex.Escape(forbiddenSymbols)));
-                if (r.Match(nameFile).Success)
-                {
-                    return false;
-                }
-                else
-                {
-                    File.Create($"{nameFile}.csv").Close();
-                    _nameFile = $"{nameFile}.csv";
-                    return true;
-                }
+                File.Create($"{nameFile}.csv").Close();
+                _nameFile = $"{nameFile}.csv";
+                return true;
             }
+            return false;
         }
 
         public int AmountOfContact()
@@ -54,21 +49,21 @@ namespace test1
             {
                 return 0;
             }
-
         }
 
         public bool TryTakeContacts(int offset, int take, out List<Contact> outContacts)
         {
             outContacts = new();
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             try
             {
                 using StreamReader sw = new(_nameFile, Encoding.GetEncoding(1251));
                 int i = 0;
                 string? readLine = "";
+                int takeAddOffset = take + offset;
                 while ((readLine = sw.ReadLine()) != null)
                 {
-                    if (i >= offset && i < take + offset)
+                    if (i >= offset && i < takeAddOffset)
                     {
                         outContacts.Add(ParsLineInContact(readLine));
                     }
@@ -102,16 +97,15 @@ namespace test1
             }
         }
 
-        private static Contact ParsLineInContact(string line)
+        private Contact ParsLineInContact(string line)
         {
-            Regex r = new("[^;]+");
-            MatchCollection matches = r.Matches(line);
+            MatchCollection matches = _separatorChar.Matches(line);
 
-            string oneWord = DeliteEscape(matches[0].Value);
-            string twoWord = "";
+            string oneWord = TrimEscapeChar(matches[0].Value);
+            string twoWord = String.Empty;
             if (matches.Count > 1)
             {
-                twoWord = DeliteEscape(matches[1].Value);
+                twoWord = TrimEscapeChar(matches[1].Value);
             }
 
             Contact outContsct = new(oneWord, twoWord);
@@ -119,7 +113,7 @@ namespace test1
             return outContsct;
         }
 
-        private static string DeliteEscape(string wold)
+        private static string TrimEscapeChar(string wold)
         {
             char charEscape = '\"';
             if (wold[0] == charEscape && wold[^1] == charEscape)
@@ -129,14 +123,13 @@ namespace test1
             return wold;
         }
 
-        private static bool ValidationInput(string? input)
+        private bool ValidationInput(string? input)
         {
             if (input == null)
             {
                 return true;
             }
-            Regex regex = new(";");
-            return regex.Match(input).Success;
+            return  _validationSeparatorChar.Match(input).Success;
         }
     }
 }

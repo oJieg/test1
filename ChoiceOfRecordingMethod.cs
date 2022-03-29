@@ -49,7 +49,7 @@ namespace test1
                 Console.WriteLine("Выберите имя:");
                 string name = "";
                 name += Console.ReadLine();
-                correctName = inInterfase.TryInitializationBD(name);
+                correctName = inInterfase.TryInitializationDB(name);
             }
             return inInterfase;
         }

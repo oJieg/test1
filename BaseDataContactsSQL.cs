@@ -13,15 +13,15 @@ namespace test1
     /// </summary>
     public class BaseDataContactsSQL : IDataContactInterface
     {
-        private string _dataSourceBD = "";
-        private string _nameFile = "";
+        private string _dataSourceBD = String.Empty;
+        private string _nameFile = String.Empty;
 
         /// <summary>
         /// nameFile - имя файла без разширения. В случаи не допустимого имени, вернет false.
         /// </summary>
         /// <param name="nameFile"></param>
         /// <returns></returns>
-        public bool TryInitializationBD(string nameFile)
+        public bool TryInitializationDB(string nameFile)
         {
             string forbiddenSymbols = new(Path.GetInvalidFileNameChars());
             Regex r = new(string.Format("[{0}]", Regex.Escape(forbiddenSymbols)));
