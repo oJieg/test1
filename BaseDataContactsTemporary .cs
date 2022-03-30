@@ -15,7 +15,6 @@ namespace test1
         {
             try
             {
-
                 if (string.IsNullOrWhiteSpace(phone))
                 {
                     _contacts.Add(new Contact(name));

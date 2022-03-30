@@ -11,7 +11,7 @@ namespace test1
     {
         private string _nameFile = string.Empty;
         private int _countLine = 0;
-        private Regex _separatorChar = new("[^;]+", RegexOptions.Compiled);
+        private readonly Regex _separatorChar = new("[^;]+", RegexOptions.Compiled);
 
         public bool TryInitializationDB(string? nameFile)
         {
@@ -21,13 +21,11 @@ namespace test1
                 _countLine = AmountOfContact();
                 return true;
             }
-
             return ValidationImputClass.TryValidatoinNameFile(nameFile, out _nameFile);
         }
 
         public bool TryAddContact(string name, string? phone)
         {
-
             if(!ValidationImputClass.TryValidationForbiddenInputContact(name, phone))
             {
                 return false;
@@ -53,10 +51,10 @@ namespace test1
                 using StreamReader sw = new(_nameFile, Encoding.GetEncoding(1251));
                 int i = 0;
                 string? readLine = "";
-                int takeAddOffset = take + offset;
+                int takeAndOffset = take + offset;
                 while ((readLine = sw.ReadLine()) != null)
                 {
-                    if (i >= offset && i < takeAddOffset)
+                    if (i >= offset && i < takeAndOffset)
                     {
                         outContacts.Add(ParsLineInContact(readLine));
                     }
@@ -69,7 +67,6 @@ namespace test1
                 Console.WriteLine(ex);
                 return false;
             }
-
         }
 
         public int AmountOfContact()

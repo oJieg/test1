@@ -13,7 +13,7 @@ namespace test1
         public static bool TryValidatoinNameFile(string? nameFile, out string fullNameFile)
         {
             fullNameFile = string.Empty;
-            if (nameFile == string.Empty)
+            if (nameFile == string.Empty || nameFile == null)
             {
                 return false;
             }
@@ -28,10 +28,9 @@ namespace test1
             }
             return false;
         }
+
         public static bool TryValidationForbiddenInputContact(string inputName, string? inputPhone)
         {
-
-            //добавить валидацию на ;
             bool correctInput;
             Regex _validationSeparatorChar = new(";", RegexOptions.Compiled);
             correctInput= _validationSeparatorChar.Match(inputName).Success;

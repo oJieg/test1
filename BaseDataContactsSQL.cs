@@ -38,9 +38,7 @@ namespace test1
                 if (comandBDsql.ExecuteScalar() == null)
                 {
                     sqlBD.Close();
-
                     File.Copy($"{_nameFile}.db", $"{_nameFile}Copy.db", true);
-
                     CreateNewTable();
                 }
                 return true;
@@ -93,7 +91,7 @@ namespace test1
         public bool TryTakeContacts(int offset, int take, out List<Contact> outContacts)
         {
             outContacts = new();
-            //валидация
+
             int amoutOfContact = AmountOfContact();
             if (offset < 0 && offset > amoutOfContact)
             {
@@ -119,7 +117,6 @@ namespace test1
             }
         }
 
-        //количество контактов в базе
         public int AmountOfContact()
         {
             try
