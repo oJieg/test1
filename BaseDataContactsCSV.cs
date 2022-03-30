@@ -9,10 +9,10 @@ namespace test1
 
     public class BaseDataContactsCSV : IDataContactInterface
     {
-        private string _nameFile = String.Empty;
+        private string _nameFile = string.Empty;
         private int _countLine = 0;
         private Regex _separatorChar = new("[^;]+", RegexOptions.Compiled);
-        private readonly Regex _validationSeparatorChar = new(";", RegexOptions.Compiled);
+
         public bool TryInitializationDB(string nameFile)
         {
             if (File.Exists($"{nameFile}.csv"))
@@ -22,32 +22,25 @@ namespace test1
                 return true;
             }
 
-            string forbiddenSymbols = new(Path.GetInvalidFileNameChars());
-            Regex r = new(string.Format("[{0}]", Regex.Escape(forbiddenSymbols)));
-            if (!r.Match(nameFile).Success)
-            {
-                File.Create($"{nameFile}.csv").Close();
-                _nameFile = $"{nameFile}.csv";
-                return true;
-            }
-            return false;
+            return ValidationImputClass.TryValidatoinNameFile(nameFile, out _nameFile);
         }
 
-        public int AmountOfContact()
+        public bool TryAddContact(string name, string? phone)
         {
+
+            if(!ValidationImputClass.TryValidationForbiddenInputContact(name, phone))
+            {
+                return false;
+            }
+
             try
             {
-                using StreamReader sw = new(_nameFile);
-                _countLine = 0;
-                while (sw.ReadLine() != null)
-                {
-                    _countLine++;
-                }
-                return _countLine;
+                File.AppendAllText(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n");
+                return true;
             }
-            catch (Exception)
+            catch
             {
-                return 0;
+                return false;
             }
         }
 
@@ -79,21 +72,21 @@ namespace test1
 
         }
 
-        public bool TryAddContact(string name, string? phone)
+        public int AmountOfContact()
         {
-            if (ValidationInput(name) || ValidationInput(phone))
-            {
-                return false;
-            }
-
             try
             {
-                File.AppendAllText(_nameFile, $"\"{name}\";\"{phone}\"\n");
-                return true;
+                using StreamReader sw = new(_nameFile);
+                _countLine = 0;
+                while (sw.ReadLine() != null)
+                {
+                    _countLine++;
+                }
+                return _countLine;
             }
-            catch
+            catch (Exception)
             {
-                return false;
+                return 0;
             }
         }
 
@@ -109,27 +102,23 @@ namespace test1
             }
 
             Contact outContsct = new(oneWord, twoWord);
-            Console.WriteLine(outContsct);
             return outContsct;
         }
 
-        private static string TrimEscapeChar(string wold)
+        private static string TrimEscapeChar(string word)
         {
+            word = Regex.Replace(word,"\"\"", "\"");
             char charEscape = '\"';
-            if (wold[0] == charEscape && wold[^1] == charEscape)
-            {
-                return wold[1..^2];
-            }
-            return wold;
+            return word.Trim(charEscape);
         }
 
-        private bool ValidationInput(string? input)
+        private static string? AddEscapeChar(string? word)
         {
-            if (input == null)
+            if (word == null)
             {
-                return true;
+                return null;
             }
-            return  _validationSeparatorChar.Match(input).Success;
+           return Regex.Replace(word, "\"", "\"\"");
         }
     }
 }

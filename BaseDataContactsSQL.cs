@@ -23,14 +23,10 @@ namespace test1
         /// <returns></returns>
         public bool TryInitializationDB(string nameFile)
         {
-            string forbiddenSymbols = new(Path.GetInvalidFileNameChars());
-            Regex r = new(string.Format("[{0}]", Regex.Escape(forbiddenSymbols)));
-            if (r.Match(nameFile).Success)
+            if (!ValidationImputClass.TryValidatoinNameFile(nameFile, out _nameFile))
             {
                 return false;
             }
-            _dataSourceBD = $"Data Source={_nameFile}.db";
-            _nameFile = nameFile;
 
             try
             {
@@ -67,6 +63,12 @@ namespace test1
 
         public bool TryAddContact(string name, string? phone)
         {
+            //валидация входяших данных
+            if (!ValidationImputClass.TryValidationForbiddenInputContact(name, phone))
+            {
+                return false;
+            }
+
             try
             {
                 using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWrite");
@@ -81,13 +83,13 @@ namespace test1
                 commandBDsql.ExecuteNonQuery();
                 return true;
             }
-            catch (SqliteException)
+            catch (SqliteException ex)
             {
+                Console.WriteLine(ex);
                 return false;
             }
         }
 
-        //офсет - начальный элемент, тейк - количество элементов
         public bool TryTakeContacts(int offset, int take, out List<Contact> outContacts)
         {
             outContacts = new();
@@ -107,7 +109,7 @@ namespace test1
                 using SqliteDataReader reader = comandBDsql.ExecuteReader();
                 while (reader.Read())
                 {
-                    outContacts.Add(new Contact(reader.GetString("Name"), reader.GetString("phone")));
+                    outContacts.Add(new Contact(reader.GetString("Name"), reader.GetString("Phone")));
                 }
                 return true;
             }
