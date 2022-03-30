@@ -28,7 +28,7 @@ namespace test1
         private static int? RenderMenuChoice()
         {
             Console.WriteLine("выберите от куда читать базу данных");
-            Console.WriteLine("1-из ОЗУ(данные стираются после работы");
+            Console.WriteLine("1-из ОЗУ (данные стираются после работы");
             Console.WriteLine("2-из SQL базы данных");
             Console.WriteLine("3-из CVS таблици ");
             try
@@ -47,9 +47,7 @@ namespace test1
             while (!correctName)
             {
                 Console.WriteLine("Выберите имя:");
-                string name = "";
-                name += Console.ReadLine();
-                correctName = inInterfase.TryInitializationDB(name);
+                correctName = inInterfase.TryInitializationDB(Console.ReadLine());
             }
             return inInterfase;
         }

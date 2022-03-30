@@ -21,7 +21,7 @@ namespace test1
         /// </summary>
         /// <param name="nameFile"></param>
         /// <returns></returns>
-        public bool TryInitializationDB(string nameFile)
+        public bool TryInitializationDB(string? nameFile)
         {
             if (!ValidationImputClass.TryValidatoinNameFile(nameFile, out _nameFile))
             {

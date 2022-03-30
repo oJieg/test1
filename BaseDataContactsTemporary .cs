@@ -6,7 +6,7 @@ namespace test1
     public class BaseDataContactsTemporary : IDataContactInterface
     {
         private readonly List<Contact> _contacts = new();
-        public bool TryInitializationDB(string nameFile)
+        public bool TryInitializationDB(string? nameFile)
         {
             return true;
         }

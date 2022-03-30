@@ -13,7 +13,7 @@ namespace test1
         private int _countLine = 0;
         private Regex _separatorChar = new("[^;]+", RegexOptions.Compiled);
 
-        public bool TryInitializationDB(string nameFile)
+        public bool TryInitializationDB(string? nameFile)
         {
             if (File.Exists($"{nameFile}.csv"))
             {
