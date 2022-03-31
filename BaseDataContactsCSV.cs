@@ -18,9 +18,10 @@ namespace test1
 
         public bool TryInitializationDB(string? nameFile)
         {
-            if (File.Exists($"{nameFile}.csv"))
+            string fullNemeFile = $"{nameFile}.csv";
+            if (File.Exists(fullNemeFile))
             {
-                _nameFile = $"{nameFile}.csv";
+                _nameFile = fullNemeFile;
                 _countLine = AmountOfContact();
                 return true;
             }
@@ -52,11 +53,11 @@ namespace test1
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             try
             {
-                using StreamReader sw = new(_nameFile, Encoding.GetEncoding(1251));
+                using StreamReader fileRead = new(_nameFile, Encoding.GetEncoding(1251));
                 int i = 0;
                 string? readLine = "";
                 int takeAndOffset = take + offset;
-                while ((readLine = sw.ReadLine()) != null)
+                while ((readLine = fileRead.ReadLine()) != null)
                 {
                     if (i >= offset && i < takeAndOffset)
                     {
@@ -88,9 +89,9 @@ namespace test1
 
             try
             {
-                using StreamReader sw = new(_nameFile);
+                using StreamReader fileRead = new(_nameFile);
                 _countLine = 0;
-                while (sw.ReadLine() != null)
+                while (fileRead.ReadLine() != null)
                 {
                     _countLine++;
                 }
@@ -108,18 +109,18 @@ namespace test1
         {
             MatchCollection matches = _separatorChar.Matches(line);
              
-            string oneWord = TrimEscapeChar(matches[0].Value);
-            string twoWord = String.Empty;
+            string firstWord = TrimEscapeChar(matches[0].Value);
+            string secondWord = String.Empty;
             if (matches.Count > 1)
             {
-                twoWord = TrimEscapeChar(matches[1].Value);
+                secondWord = TrimEscapeChar(matches[1].Value);
             }
             if(line[0] == ';')
             {
-                return new Contact(" ", oneWord);
+                return new Contact(" ", firstWord);
             }
 
-            return new Contact(oneWord, twoWord);
+            return new Contact(firstWord, secondWord);
         }
 
         private static string TrimEscapeChar(string word)

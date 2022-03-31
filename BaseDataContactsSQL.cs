@@ -53,7 +53,7 @@ namespace test1
         {
             using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWrite");
             using SqliteCommand comandBDsql =
-                new("CREATE TABLE Contact(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Name TEXT NOT NULL, Phone TEXT)", sqlBD);
+                new("CREATE TABLE Contact(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL, Phone TEXT)", sqlBD);
 
             sqlBD.Open();
             comandBDsql.ExecuteNonQuery();
