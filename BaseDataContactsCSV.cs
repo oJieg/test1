@@ -12,6 +12,9 @@ namespace test1
         private string _nameFile = string.Empty;
         private int _countLine = 0;
         private readonly Regex _separatorChar = new("[^;]+", RegexOptions.Compiled);
+        
+        private bool _flagTryAmout = false;
+        private int _amoutOfContact = 0;
 
         public bool TryInitializationDB(string? nameFile)
         {
@@ -34,6 +37,7 @@ namespace test1
             try
             {
                 File.AppendAllText(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n");
+                _flagTryAmout = false;
                 return true;
             }
             catch
@@ -58,6 +62,12 @@ namespace test1
                     {
                         outContacts.Add(ParsLineInContact(readLine));
                     }
+
+                    if(takeAndOffset < i)
+                    {
+                        break;
+                    }
+
                     i++;
                 }
                 return true;
@@ -71,6 +81,11 @@ namespace test1
 
         public int AmountOfContact()
         {
+            if(_flagTryAmout)
+            {
+                return _amoutOfContact;
+            }
+
             try
             {
                 using StreamReader sw = new(_nameFile);
@@ -79,6 +94,8 @@ namespace test1
                 {
                     _countLine++;
                 }
+                _flagTryAmout = true;
+                _amoutOfContact = _countLine;
                 return _countLine;
             }
             catch (Exception)
@@ -90,16 +107,19 @@ namespace test1
         private Contact ParsLineInContact(string line)
         {
             MatchCollection matches = _separatorChar.Matches(line);
-
+             
             string oneWord = TrimEscapeChar(matches[0].Value);
             string twoWord = String.Empty;
             if (matches.Count > 1)
             {
                 twoWord = TrimEscapeChar(matches[1].Value);
             }
+            if(line[0] == ';')
+            {
+                return new Contact(" ", oneWord);
+            }
 
-            Contact outContsct = new(oneWord, twoWord);
-            return outContsct;
+            return new Contact(oneWord, twoWord);
         }
 
         private static string TrimEscapeChar(string word)
