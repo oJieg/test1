@@ -7,18 +7,20 @@ namespace test1
     {
         static void Main(string[] args)
         {
-            IDataContactInterface contactBD = ChoiceOfRecordingMethod.InputMenuChoice();
+            Console.WriteLine(FileSelectionScreen.NameFile("2"));
+            Console.ReadLine();
+            //IDataContactInterface contactBD = ChoiceOfRecordingMethod.InputMenuChoice();
 
-            RenderContact render = new(contactBD, 4);
-            MenuInput input = new(render, contactBD);
+            //RenderContact render = new(contactBD, 4);
+            //MenuInput input = new(render, contactBD);
 
-            int page = 1; //какую страницу рендерить дальше
-            do
-            {
-                render.RenderPage(page);
-                page = input.MainInput();
-            }
-            while (page != 0);
+            //int page = 1; //какую страницу рендерить дальше
+            //do
+            //{
+            //    render.RenderPage(page);
+            //    page = input.MainInput();
+            //}
+            //while (page != 0);
         }
     }
 }
