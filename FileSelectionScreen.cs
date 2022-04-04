@@ -70,12 +70,11 @@ namespace test1
 
         private static void CreateFile(string formatFile)
         {
-            string? nameFile;
             while (true)
             {
                 Console.Clear();
                 Console.WriteLine("введите имя файла: ");
-                nameFile = Console.ReadLine();
+                string? nameFile = Console.ReadLine();
                 if (!ValidationImputClass.TryValidatoinNameFile(nameFile)
                     || File.Exists($@"{Directory.GetCurrentDirectory()}\DataBase\{nameFile}.{formatFile}"))
                 {
