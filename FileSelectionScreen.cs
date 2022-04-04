@@ -9,53 +9,135 @@ namespace test1
 {
     public static class FileSelectionScreen
     {
-        public static string NameFile(string formatFile)
-        {
-            RenderListFile("csv");
-            //Console.WriteLine(InquryNewFile());
-            return "1";
-        }
-
-        private static bool InquryNewFile()
+        public static string NameFile(string formatFile) //formatFile без точки
         {
             while (true)
             {
-                RenderInquryNewFile();
-                switch (Console.ReadLine())
+
+                string[] listNameFile = ListNameFile(formatFile);
+                int amountOfNameFile = listNameFile.Length;
+                RenderListFile(listNameFile);
+                int selectionNumberName = FileSelection(amountOfNameFile);
+
+                if (selectionNumberName == -1)
                 {
-                    case "1":
-                        return true;
-                    case "2":
-                        return false;
+                    CreateFile(formatFile);
+                }
+                else if (selectionNumberName >= 0 && selectionNumberName < amountOfNameFile)
+                {
+                    return listNameFile[selectionNumberName];
+                }
+                else
+                {
+                    Console.WriteLine("не верное значение, попробуйте еще раз, нажмите Enter для продолжения");
+                    Console.ReadLine();
                 }
             }
         }
 
-        private static void RenderInquryNewFile()
+        private static string[] ListNameFile(string formatFile)
         {
-            Console.Clear();
-            Console.WriteLine("Создать новый или откыть имеющийся 1-новый 2-старый");
+            if (!Directory.Exists(@"\DataBase"))
+            {
+                Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\DataBase");
+            }
+            return Directory.GetFiles(@$"{Directory.GetCurrentDirectory()}\DataBase", $"*.{formatFile}");
         }
 
-        private static string RenderListFile(string formateFile)
+        private static void RenderListFile(string[] listNameFile)
         {
-            string[] listFile = Directory.GetFiles(@$"{Directory.GetCurrentDirectory()}\DataBase", $"*.{formateFile}");
-            if(listFile.Count() == 0)
-            {
-                Console.WriteLine("Файлов не найдено, создайте новый");
-            }
-
-            int i=0;
-            foreach (string nameFile in listFile)
+            Console.Clear();
+            int i = 0;
+            foreach (string nameFile in listNameFile)
             {
                 i++;
                 Console.WriteLine($"{i}-{Path.GetFileName(nameFile)}");
             }
-
-            
-
-            //Directory.GetFiles("");
         }
+
+        private static int FileSelection(int amountOfNameFile)
+        {
+            Console.WriteLine($"выберети файл от 1 до {amountOfNameFile}, для создания нового файла выберете 0");
+            try
+            {
+                return Convert.ToInt32(Console.ReadLine()) - 1;
+            }
+            catch (Exception)
+            {
+                return -2;
+            }
+        }
+
+        private static void CreateFile(string formatFile)
+        {
+            string? nameFile;
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("введите имя файла: ");
+                nameFile = Console.ReadLine();
+                if (!ValidationImputClass.TryValidatoinNameFile(nameFile)
+                    || File.Exists($@"{Directory.GetCurrentDirectory()}\DataBase\{nameFile}.{formatFile}"))
+                {
+                    Console.WriteLine("недопустимые символы или такой файл уже есть, попробуйте еще раз, для продолжения нажмте Enter");
+                    Console.ReadLine();
+                    continue;
+                }
+
+                try
+                {
+                    File.Create($@"{Directory.GetCurrentDirectory()}\DataBase\{nameFile}.{formatFile}");
+                    return;
+                }
+                catch (Exception)
+                {
+                    //логи
+                }
+
+            }
+        }
+
+
+        //private static bool InquryNewFile()
+        //{
+        //    while (true)
+        //    {
+        //        RenderInquryNewFile();
+        //        switch (Console.ReadLine())
+        //        {
+        //            case "1":
+        //                return true;
+        //            case "2":
+        //                return false;
+        //        }
+        //    }
+        //}
+
+        //private static void RenderInquryNewFile()
+        //{
+        //    Console.Clear();
+        //    Console.WriteLine("Создать новый или откыть имеющийся 1-новый 2-старый");
+        //}
+
+        //private static string RenderListFile(string formateFile)
+        //{
+        //    string[] listFile = Directory.GetFiles(@$"{Directory.GetCurrentDirectory()}\DataBase", $"*.{formateFile}");
+        //    if (listFile.Count() == 0)
+        //    {
+        //        Console.WriteLine("Файлов не найдено, создайте новый");
+        //    }
+
+        //    int i = 0;
+        //    foreach (string nameFile in listFile)
+        //    {
+        //        i++;
+        //        Console.WriteLine($"{i}-{Path.GetFileName(nameFile)}");
+        //    }
+
+
+
+        //    //Directory.GetFiles("");
+        //}
 
     }
 }

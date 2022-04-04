@@ -25,7 +25,7 @@ namespace test1
                 _countLine = AmountOfContact();
                 return true;
             }
-            return ValidationImputClass.TryValidatoinNameFile(nameFile, out _nameFile);
+            return ValidationImputClass.TryValidatoinNameFile(nameFile);
         }
 
         public bool TryAddContact(string name, string? phone)

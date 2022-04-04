@@ -23,7 +23,7 @@ namespace test1
         /// <returns></returns>
         public bool TryInitializationDB(string? nameFile)
         {
-            if (!ValidationImputClass.TryValidatoinNameFile(nameFile, out _nameFile))
+            if (!ValidationImputClass.TryValidatoinNameFile(nameFile))
             {
                 return false;
             }

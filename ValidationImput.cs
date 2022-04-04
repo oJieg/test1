@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using System.IO;
 using System.Text.RegularExpressions;
 
@@ -10,9 +6,9 @@ namespace test1
 {
     public class ValidationImputClass
     {
-        public static bool TryValidatoinNameFile(string? nameFile, out string fullNameFile)
+        public static bool TryValidatoinNameFile(string? nameFile)
         {
-            fullNameFile = string.Empty;
+            //fullNameFile = string.Empty;
             if (nameFile == string.Empty || nameFile == null)
             {
                 return false;
@@ -22,8 +18,8 @@ namespace test1
             Regex r = new(string.Format("[{0}]", Regex.Escape(forbiddenSymbols)));
             if (!r.Match(nameFile).Success)
             {
-                File.Create($"{nameFile}.csv").Close();
-                fullNameFile = $"{nameFile}.csv";
+                //File.Create($"{nameFile}.csv").Close();
+                //fullNameFile = $"{nameFile}.csv";
                 return true;
             }
             return false;
