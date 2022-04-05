@@ -7,7 +7,7 @@ namespace test1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(FileSelectionScreen.NameFile("csv"));
+            Console.WriteLine(FileSelectionScreen.RenderScreen("csv"));
             Console.ReadLine();
             //IDataContactInterface contactBD = ChoiceOfRecordingMethod.InputMenuChoice();
 

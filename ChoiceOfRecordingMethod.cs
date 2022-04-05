@@ -8,15 +8,15 @@ namespace test1
 {
     public class ChoiceOfRecordingMethod
     {
-        public static IDataContactInterface InputMenuChoice()
+        public static void InputMenuChoice()
         {
             while (true)
             {
                 switch (RenderMenuChoice())
                 {
-                    case 1: return InitializationBDName(new BaseDataContactsTemporary());
-                    case 2: return InitializationBDName(new BaseDataContactsSQL());
-                    case 3: return InitializationBDName(new BaseDataContactsCSV());
+                    case 1: metodRendera(new BaseDataContactsTemporary());
+                    case 2: InitializationBDName(new BaseDataContactsSQL(),"db");
+                    case 3: InitializationBDName(new BaseDataContactsCSV(),"csv");
                     default:
                         Console.Clear();
                         Console.WriteLine("Не верное значение, попробуйте заново");
@@ -41,8 +41,11 @@ namespace test1
             }
         }
 
-        private static IDataContactInterface InitializationBDName(IDataContactInterface inInterfase)
+        private static void InitializationBDName(IDataContactInterface inInterfase, string formatFile)
         {
+            string nameFile = FileSelectionScreen.RenderScreen(formatFile);
+
+
             bool correctName = false;
             while (!correctName)
             {
