@@ -27,6 +27,7 @@ namespace test1
         {
             while (!_exitFlag)
             {
+                Update();
                 Console.Clear();
                 if (_pageCounterRender)
                 {
@@ -42,6 +43,11 @@ namespace test1
             //RenderPage(_totalNumberPage);
             //ChoiceAction(MainInput());
             //RenderPage(_totalNumberPage);
+        }
+        //
+        protected virtual void Update()
+        {
+
         }
 
         //рендер тукушей стоницы (1/5)

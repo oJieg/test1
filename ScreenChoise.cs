@@ -47,8 +47,10 @@ namespace test1
 
         private void CallBD(IDataContactInterface inInterfase, string formatFile)
         {
-            Console.WriteLine("окно с выбором имени");
-            Console.WriteLine("вызов окна с передачей ему нужного интерфейка");
+            FileSelectionScreen fileSelector = new FileSelectionScreen(1, formatFile);
+            fileSelector.MainRender();
+            
+            Console.WriteLine($"{fileSelector.GetNameFile()}вызов окна с передачей ему нужного интерфейка");
         }
     }
 }
