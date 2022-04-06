@@ -16,13 +16,6 @@ namespace test1
             _dataContact = data;
         }
 
-        public static void NewSkreen(IDataContactInterface data, int numberOfLinesOnRender)
-        {
-            Render
-        }
-
-
-
         // количество страниц выходяших из расчета количества контактов и длины строк на экране.
         public int NumberPage()
         {
