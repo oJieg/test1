@@ -26,20 +26,25 @@ namespace test1
 
         protected override void ChoiseInpyt()
         {
-            string input=  Console.ReadLine();
-            
+            string? input = Console.ReadLine();
+
 
             switch (input)
             {
-                case "1": CallBD(new BaseDataContactsTemporary(),"");
+                case "1":
+                    CallBD(new BaseDataContactsTemporary(), "");
                     break;
-                case "2": CallBD(new BaseDataContactsSQL(), "db");
+                case "2":
+                    CallBD(new BaseDataContactsSQL(), "db");
                     break;
-                case "3": CallBD(new BaseDataContactsCSV(), "csv");
+                case "3":
+                    CallBD(new BaseDataContactsCSV(), "csv");
                     break;
-                case "0": ExitScreen();
+                case "0":
+                    ExitScreen();
                     break;
-                default: MessageForNotValidInput("Нет такого варианта");
+                default:
+                    MessageForNotValidInput("Нет такого варианта");
                     break;
             }
 
@@ -47,10 +52,14 @@ namespace test1
 
         private void CallBD(IDataContactInterface inInterfase, string formatFile)
         {
-            FileSelectionScreen fileSelector = new FileSelectionScreen(1, formatFile);
+            FileSelectionScreen fileSelector = new FileSelectionScreen(2, formatFile);
             fileSelector.MainRender();
-            
-            Console.WriteLine($"{fileSelector.GetNameFile()}вызов окна с передачей ему нужного интерфейка");
+            if (fileSelector.GetNameFile(out string nameFile))
+            {
+                Console.WriteLine($"{nameFile}вызов окна с передачей ему нужного интерфейка");
+                Console.ReadLine();
+            }
+
         }
     }
 }

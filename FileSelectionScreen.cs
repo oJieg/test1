@@ -11,85 +11,106 @@ namespace test1
     {
         private string _formatFile;
         private string[] listNameFile;
-        private int amountOfNameFile;
-        private string nameFile;
+        //private int amountOfNameFile;
+        private string _nameFile;
+        private bool _flagCorrectNameFile = false;
         public FileSelectionScreen(int numberOfLinesOnRender, string formatFile)
             : base(numberOfLinesOnRender)
         {
+            //_numberOfLinesOnRender = numberOfLinesOnRender;
             _formatFile = formatFile;
+            _pageCounterRender = true;
         }
 
-        public string GetNameFile()
+        public bool GetNameFile(out string nameFile)
         {
-            return nameFile;
+            nameFile = _nameFile;
+            return _flagCorrectNameFile;
         }
 
         protected override void Update()
         {
+            TakeAndOffsetForTotalPage();
             ListNameFile();
-            amountOfNameFile = listNameFile.Length;
+            _fullAmountOfLine = listNameFile.Length;
         }
+
         protected override void PageRender()
         {
+            TakeAndOffsetForTotalPage();
+            //for (int i = offset; i <take; i++)
+
             int i = 0;
             foreach (string nameFile in listNameFile)
             {
+                int takeAndOffset = _offsetForTotalNumber+ _takeForTotalNumber;
                 i++;
-                Console.WriteLine($"{i}-{Path.GetFileName(nameFile)}");
+                if (i > _offsetForTotalNumber && i <= takeAndOffset)
+                {
+                    Console.WriteLine($"{i-_offsetForTotalNumber}-{Path.GetFileName(nameFile)}");
+                }
+                if (i >= takeAndOffset)
+                {
+                    return;
+                }
             }
-            
-            
-           
         }
 
         protected override void ChoiseMenuRender()
         {
-            Console.WriteLine($"выберети файл от 1 до {amountOfNameFile}, для создания нового файла выберете 0");
+            Console.WriteLine($"выберети файл от 1 до {_numberOfLinesOnRender}, для создания нового файла выберете N, для выхода 0");
+            Console.WriteLine("для переключения страниц используйте стрелочки");
         }
 
         protected override void ChoiseInpyt()
         {
-           if( Console.ReadLine() == "0")
+            ConsoleKeyInfo kay = Console.ReadKey();
+            if (kay.Key == ConsoleKey.RightArrow)
+            {
+                NextPage();
+                return;
+            }
+            if (kay.Key == ConsoleKey.LeftArrow)
+            {
+                PreviousPage();
+                return;
+            }
+            string input = kay.Key.ToString();
+
+            input = input[input.Length - 1].ToString();
+
+            if (input == "n" || input == "N")
+            {
+                CreateFile();
+                _flagCorrectNameFile = true;
+                return;
+            }
+
+            if (input == "0")
             {
                 ExitScreen();
+                return;
             }
-           else
+
+            try
             {
-                MessageForNotValidInput("nope");
+                int intImput = Convert.ToInt32(input);
+                if (intImput > 0 && intImput <= _fullAmountOfLine)
+                {
+                    _flagCorrectNameFile = true;
+                    _nameFile = listNameFile[intImput - 1+_offsetForTotalNumber];
+                    ExitScreen();
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageForNotValidInput("не ввеерный ввод:   ");
+                return;
+                //логи
             }
         }
 
-
-
-
-
-        //public static string NameFile(string formatFile) //formatFile без точки
-        //{
-        //    while (true)
-        //    {
-
-        //        string[] listNameFile = ListNameFile(formatFile);
-        //        int amountOfNameFile = listNameFile.Length;
-        //        RenderListFile(listNameFile);
-        //        int selectionNumberName = FileSelection(amountOfNameFile);
-
-        //        if (selectionNumberName == -1)
-        //        {
-        //            CreateFile(formatFile);
-        //        }
-        //        else if (selectionNumberName >= 0 && selectionNumberName < amountOfNameFile)
-        //        {
-        //            return listNameFile[selectionNumberName];
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine("не верное значение, попробуйте еще раз, нажмите Enter для продолжения");
-        //            Console.ReadLine();
-        //        }
-        //    }
-        //}
-
-        //+
         private void ListNameFile()
         {
             if (!Directory.Exists(@"\DataBase"))
@@ -99,31 +120,7 @@ namespace test1
             listNameFile = Directory.GetFiles(@$"{Directory.GetCurrentDirectory()}\DataBase", $"*.{_formatFile}");
         }
 
-        private static void RenderListFile(string[] listNameFile)
-        {
-            Console.Clear();
-            int i = 0;
-            foreach (string nameFile in listNameFile)
-            {
-                i++;
-                Console.WriteLine($"{i}-{Path.GetFileName(nameFile)}");
-            }
-        }
-
-        private static int FileSelection(int amountOfNameFile)
-        {
-            Console.WriteLine($"выберети файл от 1 до {amountOfNameFile}, для создания нового файла выберете 0");
-            try
-            {
-                return Convert.ToInt32(Console.ReadLine()) - 1;
-            }
-            catch (Exception)
-            {
-                return -2;
-            }
-        }
-
-        private static void CreateFile(string formatFile)
+        private void CreateFile()
         {
             while (true)
             {
@@ -131,20 +128,20 @@ namespace test1
                 Console.WriteLine("введите имя файла: ");
                 string? nameFile = Console.ReadLine();
                 if (!ValidationImputClass.TryValidatoinNameFile(nameFile)
-                    || File.Exists($@"{Directory.GetCurrentDirectory()}\DataBase\{nameFile}.{formatFile}"))
+                    || File.Exists($@"{Directory.GetCurrentDirectory()}\DataBase\{nameFile}.{_formatFile}"))
                 {
-                    Console.WriteLine("недопустимые символы или такой файл уже есть, попробуйте еще раз, для продолжения нажмте Enter");
-                    Console.ReadLine();
+                    MessageForNotValidInput("недопустимые ссиволы");
                     continue;
                 }
 
                 try
                 {
-                    File.Create($@"{Directory.GetCurrentDirectory()}\DataBase\{nameFile}.{formatFile}");
+                    File.Create($@"{Directory.GetCurrentDirectory()}\DataBase\{nameFile}.{_formatFile}");
                     return;
                 }
                 catch (Exception)
                 {
+                    MessageForNotValidInput("ошибка создания файла");
                     //логи
                 }
             }

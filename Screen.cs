@@ -9,7 +9,9 @@ namespace test1
     public abstract class Screen
     {
         protected int _numberOfLinesOnRender; //сколько строк на одном экране
-        protected int _totalNumberPage { get; set; } // открытая в данный момент страница
+        protected int _totalNumberPage; // открытая в данный момент страница
+        protected int _offsetForTotalNumber; //offset текушей страницы
+        protected int _takeForTotalNumber;
         protected int _maxAmoutOfPage; // сколько всего страниц
         protected int _fullAmountOfLine; //в данный момент сколько строк есть в наличии
         protected bool _pageCounterRender; // выводить ли на экран отображение страницы текушей(1/5)
@@ -18,8 +20,9 @@ namespace test1
         public Screen(int numberOfLinesOnRender)
         {
             _numberOfLinesOnRender = numberOfLinesOnRender;
-            _fullAmountOfLine = FullAmoutOfLine();
+            //_fullAmountOfLine = FullAmoutOfLine();
             _pageCounterRender = false;
+            _totalNumberPage = 1;
         }
 
         //главный метод который нужно вызывать
@@ -28,6 +31,7 @@ namespace test1
             while (!_exitFlag)
             {
                 Update();
+                FullAmoutOfLine();
                 Console.Clear();
                 if (_pageCounterRender)
                 {
@@ -44,10 +48,11 @@ namespace test1
             //ChoiceAction(MainInput());
             //RenderPage(_totalNumberPage);
         }
-        //
+
+        //запускается перед каждой новой итарацией вызова
         protected virtual void Update()
         {
-
+            TakeAndOffsetForTotalPage();
         }
 
         //рендер тукушей стоницы (1/5)
@@ -56,21 +61,37 @@ namespace test1
             Console.WriteLine($"{_totalNumberPage}/{_maxAmoutOfPage}");
         }
 
-        //возврашает сколько строк всего в наличии
-        protected virtual int FullAmoutOfLine()
+        //считает сколько страниц всего в наличии
+        protected virtual void FullAmoutOfLine()
         {
-            return 1;
+            int numberPage = _fullAmountOfLine / _numberOfLinesOnRender;
+
+            if (numberPage > 0)
+            {
+                if (_fullAmountOfLine % _numberOfLinesOnRender != 0)
+                {
+                    _maxAmoutOfPage =  numberPage + 1;
+                }
+                else
+                {
+                    _maxAmoutOfPage =  numberPage;
+                }
+            }
+            else
+            {
+                _maxAmoutOfPage =  1;
+            }
         }
 
         //явно возврашает первый элемент и кол-во элементов
-        protected void TakeAndOffsetForTotalPage(out int offset, out int take)
+        protected void TakeAndOffsetForTotalPage()
         {
             int numberPage;
             numberPage = _totalNumberPage <= 0 ? 1 : _totalNumberPage;
             numberPage = _totalNumberPage >= _maxAmoutOfPage ? _maxAmoutOfPage : _totalNumberPage;
 
-            offset = (numberPage - 1) * _numberOfLinesOnRender;
-            take = _numberOfLinesOnRender;
+            _offsetForTotalNumber = (numberPage - 1) * _numberOfLinesOnRender;
+            _takeForTotalNumber = _numberOfLinesOnRender;
         }
         protected virtual void MessageForNotValidInput(string message)
         {
