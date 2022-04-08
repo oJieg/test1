@@ -9,20 +9,22 @@ namespace test1
     public abstract class Screen
     {
         protected int _numberOfLinesOnRender; //сколько строк на одном экране
-        protected int _totalNumberPage; // открытая в данный момент страница
+        protected int _totalPages; // сколько всего страниц
+
+        protected int _currentPageNumber; // открытая в данный момент страница
         protected int _offsetForTotalNumber; //offset текушей страницы
-        protected int _takeForTotalNumber;
-        protected int _maxAmoutOfPage; // сколько всего страниц
-        protected int _fullAmountOfLine; //в данный момент сколько строк есть в наличии
+        protected int _takeForTotalNumber; //take для текушей страницы
+
+        protected int _fullAmountOfLine; //в данный момент сколько строк есть в наличии для вывода
         protected bool _pageCounterRender; // выводить ли на экран отображение страницы текушей(1/5)
-        private bool _exitFlag = false; //флаг выхода из приложения
+        private bool _exitFlag = false; //флаг выхода из окна
 
         public Screen(int numberOfLinesOnRender)
         {
             _numberOfLinesOnRender = numberOfLinesOnRender;
             //_fullAmountOfLine = FullAmoutOfLine();
             _pageCounterRender = false;
-            _totalNumberPage = 1;
+            _currentPageNumber = 1;
         }
 
         //главный метод который нужно вызывать
@@ -58,7 +60,7 @@ namespace test1
         //рендер тукушей стоницы (1/5)
         protected void PageCounterRender()
         {
-            Console.WriteLine($"{_totalNumberPage}/{_maxAmoutOfPage}");
+            Console.WriteLine($"{_currentPageNumber}/{_totalPages}");
         }
 
         //считает сколько страниц всего в наличии
@@ -70,27 +72,23 @@ namespace test1
             {
                 if (_fullAmountOfLine % _numberOfLinesOnRender != 0)
                 {
-                    _maxAmoutOfPage =  numberPage + 1;
+                    _totalPages = numberPage + 1;
                 }
                 else
                 {
-                    _maxAmoutOfPage =  numberPage;
+                    _totalPages = numberPage;
                 }
             }
             else
             {
-                _maxAmoutOfPage =  1;
+                _totalPages = 1;
             }
         }
 
         //явно возврашает первый элемент и кол-во элементов
         protected void TakeAndOffsetForTotalPage()
         {
-            int numberPage;
-            numberPage = _totalNumberPage <= 0 ? 1 : _totalNumberPage;
-            numberPage = _totalNumberPage >= _maxAmoutOfPage ? _maxAmoutOfPage : _totalNumberPage;
-
-            _offsetForTotalNumber = (numberPage - 1) * _numberOfLinesOnRender;
+            _offsetForTotalNumber = (_currentPageNumber - 1) * _numberOfLinesOnRender;
             _takeForTotalNumber = _numberOfLinesOnRender;
         }
         protected virtual void MessageForNotValidInput(string message)
@@ -107,17 +105,17 @@ namespace test1
 
         protected void NextPage()
         {
-            if (_totalNumberPage < _maxAmoutOfPage)
+            if (_currentPageNumber < _totalPages)
             {
-                _totalNumberPage++;
+                _currentPageNumber++;
             }
         }
 
         protected void PreviousPage()
         {
-            if (_totalNumberPage > 1)
+            if (_currentPageNumber > 1)
             {
-                _totalNumberPage--;
+                _currentPageNumber--;
             }
         }
 

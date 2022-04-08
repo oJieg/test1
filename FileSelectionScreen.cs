@@ -37,22 +37,15 @@ namespace test1
 
         protected override void PageRender()
         {
-            TakeAndOffsetForTotalPage();
-            //for (int i = offset; i <take; i++)
-
-            int i = 0;
-            foreach (string nameFile in listNameFile)
+            int takeAndOffset = _offsetForTotalNumber + _takeForTotalNumber;
+            if (takeAndOffset > _fullAmountOfLine)
             {
-                int takeAndOffset = _offsetForTotalNumber+ _takeForTotalNumber;
-                i++;
-                if (i > _offsetForTotalNumber && i <= takeAndOffset)
-                {
-                    Console.WriteLine($"{i-_offsetForTotalNumber}-{Path.GetFileName(nameFile)}");
-                }
-                if (i >= takeAndOffset)
-                {
-                    return;
-                }
+                takeAndOffset = _fullAmountOfLine;
+            }
+
+            for (int i = _offsetForTotalNumber; i < takeAndOffset; i++)
+            {
+                Console.WriteLine($"{i - _offsetForTotalNumber+1}-{Path.GetFileName(listNameFile[i])}");
             }
         }
 
@@ -98,7 +91,7 @@ namespace test1
                 if (intImput > 0 && intImput <= _fullAmountOfLine)
                 {
                     _flagCorrectNameFile = true;
-                    _nameFile = listNameFile[intImput - 1+_offsetForTotalNumber];
+                    _nameFile = listNameFile[intImput - 1 + _offsetForTotalNumber];
                     ExitScreen();
                     return;
                 }
