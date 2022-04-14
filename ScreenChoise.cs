@@ -24,27 +24,23 @@ namespace test1
             Console.WriteLine("введите 1-3 или 0 для выхода");
         }
 
-        protected override void ChoiseInpyt()
+        protected override void ChoiseInpyt(int InputInt, string InputString)
         {
-            string? input = Console.ReadLine();
+            base.ChoiseInpyt(InputInt, InputString);
 
-
-            switch (input)
+            switch (InputInt)
             {
-                case "1":
+                case 1:
                     CallBD(new BaseDataContactsTemporary(), "");
                     break;
-                case "2":
+                case 2:
                     CallBD(new BaseDataContactsSQL(), "db");
                     break;
-                case "3":
+                case 3:
                     CallBD(new BaseDataContactsCSV(), "csv");
                     break;
-                case "0":
-                    ExitScreen();
-                    break;
                 default:
-                    MessageForNotValidInput("Нет такого варианта");
+                    //MessageForNotValidInput("Нет такого варианта");
                     break;
             }
 
@@ -52,7 +48,7 @@ namespace test1
 
         private void CallBD(IDataContactInterface inInterfase, string formatFile)
         {
-            FileSelectionScreen fileSelector = new FileSelectionScreen(2, formatFile);
+            ScreenFileSelection fileSelector = new ScreenFileSelection(2, formatFile);
             fileSelector.MainRender();
             if (fileSelector.GetNameFile(out string nameFile))
             {

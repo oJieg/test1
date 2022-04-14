@@ -7,14 +7,14 @@ using System.IO;
 
 namespace test1
 {
-    public class FileSelectionScreen : Screen
+    public class ScreenFileSelection : Screen
     {
         private string _formatFile;
         private string[] listNameFile;
         //private int amountOfNameFile;
         private string _nameFile;
         private bool _flagCorrectNameFile = false;
-        public FileSelectionScreen(int numberOfLinesOnRender, string formatFile)
+        public ScreenFileSelection(int numberOfLinesOnRender, string formatFile)
             : base(numberOfLinesOnRender)
         {
             //_numberOfLinesOnRender = numberOfLinesOnRender;
@@ -30,9 +30,8 @@ namespace test1
 
         protected override void Update()
         {
-            TakeAndOffsetForTotalPage();
+            base.Update();
             ListNameFile();
-            _fullAmountOfLine = listNameFile.Length;
         }
 
         protected override void PageRender()
@@ -45,63 +44,34 @@ namespace test1
 
             for (int i = _offsetForTotalNumber; i < takeAndOffset; i++)
             {
-                Console.WriteLine($"{i - _offsetForTotalNumber+1}-{Path.GetFileName(listNameFile[i])}");
+                Console.WriteLine($"{i - _offsetForTotalNumber + 1}-{Path.GetFileName(listNameFile[i])}");
             }
         }
 
         protected override void ChoiseMenuRender()
         {
             Console.WriteLine($"выберети файл от 1 до {_numberOfLinesOnRender}, для создания нового файла выберете N, для выхода 0");
-            Console.WriteLine("для переключения страниц используйте стрелочки");
+            base.ChoiseMenuRender();
         }
 
-        protected override void ChoiseInpyt()
+        protected override void ChoiseInpyt(int InputInt, string InputString)
         {
-            ConsoleKeyInfo kay = Console.ReadKey();
-            if (kay.Key == ConsoleKey.RightArrow)
-            {
-                NextPage();
-                return;
-            }
-            if (kay.Key == ConsoleKey.LeftArrow)
-            {
-                PreviousPage();
-                return;
-            }
-            string input = kay.Key.ToString();
-
-            input = input[input.Length - 1].ToString();
-
-            if (input == "n" || input == "N")
+            base.ChoiseInpyt(InputInt, InputString);
+            if (InputString == "n" || InputString == "N")
             {
                 CreateFile();
                 _flagCorrectNameFile = true;
                 return;
             }
 
-            if (input == "0")
+            if (InputInt > 0 && InputInt < _fullAmountOfLine)
             {
+                _flagCorrectNameFile = true;
+                _nameFile = listNameFile[InputInt - 1 + _offsetForTotalNumber];
                 ExitScreen();
                 return;
             }
 
-            try
-            {
-                int intImput = Convert.ToInt32(input);
-                if (intImput > 0 && intImput <= _fullAmountOfLine)
-                {
-                    _flagCorrectNameFile = true;
-                    _nameFile = listNameFile[intImput - 1 + _offsetForTotalNumber];
-                    ExitScreen();
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageForNotValidInput("не ввеерный ввод:   ");
-                return;
-                //логи
-            }
         }
 
         private void ListNameFile()
@@ -111,6 +81,7 @@ namespace test1
                 Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\DataBase");
             }
             listNameFile = Directory.GetFiles(@$"{Directory.GetCurrentDirectory()}\DataBase", $"*.{_formatFile}");
+            _fullAmountOfLine = listNameFile.Length;
         }
 
         private void CreateFile()

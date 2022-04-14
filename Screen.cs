@@ -41,14 +41,11 @@ namespace test1
                 }
                 PageRender();
                 ChoiseMenuRender();
-                ChoiseInpyt();
-                //MessageForNotValidInput();
+
+                KeyInput(out int InputInt, out string InputString);
+                ChoiseInpyt(InputInt, InputString);
+
             }
-
-
-            //RenderPage(_totalNumberPage);
-            //ChoiceAction(MainInput());
-            //RenderPage(_totalNumberPage);
         }
 
         //запускается перед каждой новой итарацией вызова
@@ -94,7 +91,7 @@ namespace test1
         protected virtual void MessageForNotValidInput(string message)
         {
             Console.WriteLine($"{message}, Для продлжения нажмите Enter");
-            Console.ReadLine();
+            Console.ReadKey();
         }
 
         //дефолт -1
@@ -119,11 +116,53 @@ namespace test1
             }
         }
 
-        //запрос пользователя и бработка выбора
-        protected abstract void ChoiseInpyt();
+        protected virtual void KeyInput(out int InputInt, out string InputString)
+        {
+            ConsoleKeyInfo kay = Console.ReadKey();
+
+            InputString = kay.Key.ToString();
+            if (InputString.Length > 1 && (InputString.Remove(1) == "D" || InputString.Remove(3) == "Num"))
+            {
+                try
+                {
+                    InputInt = Convert.ToInt32(InputString[InputString.Length - 1].ToString());
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    //логи
+                }
+            }
+            InputInt = -1;
+
+        }
+
+        //обработка выбора
+        protected virtual void ChoiseInpyt(int InputInt, string InputString)
+        {
+            if (InputString == "RightArrow")
+            {
+                NextPage();
+                return;
+            }
+            if (InputString == "LeftArrow")
+            {
+                PreviousPage();
+                return;
+            }
+
+            if (InputInt == 0 || InputString == "Escape")
+            {
+                ExitScreen();
+                return;
+            }
+        }
 
         //рендер меню выбора
-        protected abstract void ChoiseMenuRender();
+        protected virtual void ChoiseMenuRender()
+        {
+            Console.WriteLine("для переключения страниц используйте стрелочки, назад - 0 или Escape");
+        }
 
         //сюда кладем чего отображать
         protected abstract void PageRender();
