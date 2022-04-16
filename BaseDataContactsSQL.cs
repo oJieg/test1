@@ -36,11 +36,11 @@ namespace test1
                     File.Copy($"{nameFile}", $"{nameFile}.Copy", true);
                     CreateNewTable();
                 }
-               // _dataSourceBD=nameFile;
                 return true;
             }
             catch (Exception)
             {
+                //логи
                 return false;
             }
         }
@@ -57,7 +57,6 @@ namespace test1
 
         public bool TryAddContact(string name, string? phone)
         {
-            //валидация входяших данных
             if (!ValidationImputClass.TryValidationForbiddenInputContact(name, phone))
             {
                 return false;

@@ -31,14 +31,14 @@ namespace test1
             Console.WriteLine("введите 1-3 или 0 или Escape для выхода");
         }
 
-        protected override void ChoiseInpyt(int InputInt, string InputString)
+        protected override void ChoiseInpyt(int inputInt, string inputString)
         {
-            base.ChoiseInpyt(InputInt, InputString);
+            base.ChoiseInpyt(inputInt, inputString);
 
-            switch (InputInt)
+            switch (inputInt)
             {
                 case 1:
-                    CallBD(new BaseDataContactsTemporary(), "");
+                    CallBD(new BaseDataContactsTemporary(), string.Empty);
                     break;
                 case 2:
                     CallBD(new BaseDataContactsSQL(), "db");
@@ -47,7 +47,6 @@ namespace test1
                     CallBD(new BaseDataContactsCSV(), "csv");
                     break;
                 default:
-                    //MessageForNotValidInput("Нет такого варианта");
                     break;
             }
 
@@ -55,20 +54,20 @@ namespace test1
 
         private void CallBD(IDataContactInterface inInterfase, string formatFile)
         {
-            ScreenFileSelection fileSelector = new ScreenFileSelection(2, formatFile);
-            fileSelector.MainRender();
-            if (fileSelector.GetNameFile(out string nameFile))
+            string nameFile = string.Empty;
+
+            if (formatFile != string.Empty)
             {
-                if (inInterfase.TryInitializationDB(nameFile))
-                {
-                    ScreenMainBD screenMainBD = new ScreenMainBD(_numberOfLinesOnRender, inInterfase);
-                    screenMainBD.MainRender();
-                }
-                //Console.WriteLine($"{nameFile}вызов окна с передачей ему нужного интерфейка");
-                //Console.ReadLine();
+                ScreenFileSelection fileSelector = new ScreenFileSelection(2, formatFile);
+                fileSelector.MainRender();
+                nameFile = fileSelector.GetNameFile();
             }
 
+            if (inInterfase.TryInitializationDB(nameFile))
+            {
+                ScreenMainBD screenMainBD = new ScreenMainBD(_numberOfLinesOnRender, inInterfase);
+                screenMainBD.MainRender();
+            }
         }
-
     }
 }

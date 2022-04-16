@@ -10,7 +10,7 @@ namespace test1
         private string[] listNameFile;
         //private int amountOfNameFile;
         private string _nameFile;
-        private bool _flagCorrectNameFile = false;
+
         public ScreenFileSelection(int numberOfLinesOnRender, string formatFile)
             : base(numberOfLinesOnRender)
         {
@@ -19,10 +19,9 @@ namespace test1
             _pageCounterRender = true;
         }
 
-        public bool GetNameFile(out string nameFile)
+        public string GetNameFile()
         {
-            nameFile = _nameFile;
-            return _flagCorrectNameFile;
+            return _nameFile;
         }
 
         protected override void Update()
@@ -59,13 +58,11 @@ namespace test1
             if (InputString == "n" || InputString == "N")
             {
                 CreateFile();
-                _flagCorrectNameFile = true;
                 return;
             }
 
             if (InputInt > 0 && InputInt <= _takeForTotalNumber)
             {
-                _flagCorrectNameFile = true;
                 _nameFile = listNameFile[InputInt - 1 + _offsetForTotalNumber];
                 ExitScreen();
                 return;

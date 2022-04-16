@@ -20,7 +20,6 @@ namespace test1
         {
             _numberOfLinesOnRender = numberOfLinesOnRender;
             _currentPageNumber = 1;
-
         }
 
         //главный метод который нужно вызывать
@@ -41,7 +40,6 @@ namespace test1
 
                 KeyInput(out int InputInt, out string InputString);
                 ChoiseInpyt(InputInt, InputString);
-
             }
         }
 
@@ -79,6 +77,7 @@ namespace test1
             _offsetForTotalNumber = (_currentPageNumber - 1) * _numberOfLinesOnRender;
             _takeForTotalNumber = _numberOfLinesOnRender;
         }
+
         protected void MessageForNotValidInput(string message)
         {
             Console.WriteLine($"{message}, Для продлжения нажмите любую клавишу");
@@ -125,7 +124,6 @@ namespace test1
                 }
             }
             InputInt = -1;
-
         }   
         
         //метод красивого отображения)
@@ -147,20 +145,19 @@ namespace test1
         }
 
         //обработка выбора
-        protected virtual void ChoiseInpyt(int InputInt, string InputString)
+        protected virtual void ChoiseInpyt(int inputInt, string inputString)
         {
-            if (InputString == "RightArrow")
+            if (inputString == "RightArrow")
             {
                 NextPage();
                 return;
             }
-            if (InputString == "LeftArrow")
+            if (inputString == "LeftArrow")
             {
                 PreviousPage();
                 return;
             }
-
-            if (InputInt == 0 || InputString == "Escape")
+            if (inputInt == 0 || inputString == "Escape")
             {
                 ExitScreen();
                 return;
