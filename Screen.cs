@@ -178,6 +178,5 @@ namespace test1
 
         //сюда кладем чего отображать
         protected abstract List<string> DataForPageRender();
-
     }
 }
