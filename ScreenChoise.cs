@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace test1
 {
@@ -10,18 +11,24 @@ namespace test1
         {
         }
 
-        protected override void PageRender()
+        protected override void Title()
         {
             Console.WriteLine("выберите от куда читать базу данных");
-            Console.WriteLine("1-из ОЗУ (данные стираются после работы");
-            Console.WriteLine("2-из SQL базы данных");
-            Console.WriteLine("3-из CVS таблици ");
-            Console.WriteLine("0 - выход");
+        }
+
+        protected override List<string> DataForPageRender()
+        {
+            List<string> data = new();
+
+            data.Add("из ОЗУ (данные стираются после работы");
+            data.Add("из SQL базы данных");
+            data.Add("из CVS таблици ");
+            return data;
         }
 
         protected override void ChoiseMenuRender()
         {
-            Console.WriteLine("введите 1-3 или 0 для выхода");
+            Console.WriteLine("введите 1-3 или 0 или Escape для выхода");
         }
 
         protected override void ChoiseInpyt(int InputInt, string InputString)
@@ -52,10 +59,16 @@ namespace test1
             fileSelector.MainRender();
             if (fileSelector.GetNameFile(out string nameFile))
             {
-                Console.WriteLine($"{nameFile}вызов окна с передачей ему нужного интерфейка");
-                Console.ReadLine();
+                if (inInterfase.TryInitializationDB(nameFile))
+                {
+                    ScreenMainBD screenMainBD = new ScreenMainBD(_numberOfLinesOnRender, inInterfase);
+                    screenMainBD.MainRender();
+                }
+                //Console.WriteLine($"{nameFile}вызов окна с передачей ему нужного интерфейка");
+                //Console.ReadLine();
             }
 
         }
+
     }
 }

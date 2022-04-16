@@ -16,16 +16,15 @@ namespace test1
         private bool _flagTryAmout = false;
         private int _amoutOfContact = 0;
 
-        public bool TryInitializationDB(string? nameFile)
+        public bool TryInitializationDB(string nameFile)
         {
-            string fullNemeFile = $"{nameFile}.csv";
-            if (File.Exists(fullNemeFile))
+            if (!File.Exists(nameFile))
             {
-                _nameFile = fullNemeFile;
-                _countLine = AmountOfContact();
-                return true;
+                return false;
             }
-            return ValidationImputClass.TryValidatoinNameFile(nameFile);
+            _nameFile = nameFile;
+            _countLine = AmountOfContact();
+            return true;
         }
 
         public bool TryAddContact(string name, string? phone)

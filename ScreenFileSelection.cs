@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace test1
@@ -34,18 +31,20 @@ namespace test1
             ListNameFile();
         }
 
-        protected override void PageRender()
+        protected override List<string> DataForPageRender()
         {
             int takeAndOffset = _offsetForTotalNumber + _takeForTotalNumber;
             if (takeAndOffset > _fullAmountOfLine)
             {
                 takeAndOffset = _fullAmountOfLine;
             }
+            List<string> data = new();
 
             for (int i = _offsetForTotalNumber; i < takeAndOffset; i++)
             {
-                Console.WriteLine($"{i - _offsetForTotalNumber + 1}-{Path.GetFileName(listNameFile[i])}");
+                data.Add(Path.GetFileName(listNameFile[i]));
             }
+            return data;
         }
 
         protected override void ChoiseMenuRender()
@@ -64,7 +63,7 @@ namespace test1
                 return;
             }
 
-            if (InputInt > 0 && InputInt < _fullAmountOfLine)
+            if (InputInt > 0 && InputInt <= _takeForTotalNumber)
             {
                 _flagCorrectNameFile = true;
                 _nameFile = listNameFile[InputInt - 1 + _offsetForTotalNumber];
@@ -73,7 +72,7 @@ namespace test1
             }
 
         }
-
+        //----------------------------------------------------------------------------
         private void ListNameFile()
         {
             if (!Directory.Exists(@"\DataBase"))

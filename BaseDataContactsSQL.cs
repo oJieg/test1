@@ -14,23 +14,18 @@ namespace test1
     public class BaseDataContactsSQL : IDataContactInterface
     {
         private string _dataSourceBD = String.Empty;
-        private string _nameFile = String.Empty;
+        //private string _nameFile = String.Empty;
 
-        /// <summary>
-        /// nameFile - имя файла без разширения. В случаи не допустимого имени, вернет false.
-        /// </summary>
-        /// <param name="nameFile"></param>
-        /// <returns></returns>
-        public bool TryInitializationDB(string? nameFile)
+        public bool TryInitializationDB(string nameFile)
         {
-            if (!ValidationImputClass.TryValidatoinNameFile(nameFile))
+            if (!File.Exists(nameFile))
             {
                 return false;
             }
 
             try
             {
-                using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWriteCreate");
+                using SqliteConnection sqlBD = new($"{nameFile}; mode=ReadWriteCreate");
                 using SqliteCommand comandBDsql =
                     new("select Type from sqlite_master WHERE type='table' and name='Contact';", sqlBD);
                 sqlBD.Open();
@@ -38,9 +33,10 @@ namespace test1
                 if (comandBDsql.ExecuteScalar() == null)
                 {
                     sqlBD.Close();
-                    File.Copy($"{_nameFile}.db", $"{_nameFile}Copy.db", true);
+                    File.Copy($"{nameFile}.db", $"{nameFile}Copy.db", true);
                     CreateNewTable();
                 }
+                _dataSourceBD=nameFile;
                 return true;
             }
             catch (Exception)

@@ -22,9 +22,8 @@ namespace test1
         public Screen(int numberOfLinesOnRender)
         {
             _numberOfLinesOnRender = numberOfLinesOnRender;
-            //_fullAmountOfLine = FullAmoutOfLine();
-            _pageCounterRender = false;
             _currentPageNumber = 1;
+
         }
 
         //главный метод который нужно вызывать
@@ -39,19 +38,14 @@ namespace test1
                 {
                     PageCounterRender();
                 }
-                PageRender();
+                Title();
+                PageRender(DataForPageRender());
                 ChoiseMenuRender();
 
                 KeyInput(out int InputInt, out string InputString);
                 ChoiseInpyt(InputInt, InputString);
 
             }
-        }
-
-        //запускается перед каждой новой итарацией вызова
-        protected virtual void Update()
-        {
-            TakeAndOffsetForTotalPage();
         }
 
         //рендер тукушей стоницы (1/5)
@@ -61,7 +55,7 @@ namespace test1
         }
 
         //считает сколько страниц всего в наличии
-        protected virtual void FullAmoutOfLine()
+        protected void FullAmoutOfLine()
         {
             int numberPage = _fullAmountOfLine / _numberOfLinesOnRender;
 
@@ -88,9 +82,9 @@ namespace test1
             _offsetForTotalNumber = (_currentPageNumber - 1) * _numberOfLinesOnRender;
             _takeForTotalNumber = _numberOfLinesOnRender;
         }
-        protected virtual void MessageForNotValidInput(string message)
+        protected void MessageForNotValidInput(string message)
         {
-            Console.WriteLine($"{message}, Для продлжения нажмите Enter");
+            Console.WriteLine($"{message}, Для продлжения нажмите любую клавишу");
             Console.ReadKey();
         }
 
@@ -116,7 +110,7 @@ namespace test1
             }
         }
 
-        protected virtual void KeyInput(out int InputInt, out string InputString)
+        protected void KeyInput(out int InputInt, out string InputString)
         {
             ConsoleKeyInfo kay = Console.ReadKey();
 
@@ -135,6 +129,24 @@ namespace test1
             }
             InputInt = -1;
 
+        }   
+        
+        //метод красивого отображения)
+        protected void PageRender(List<string> dataForPageRender)
+        {
+            int i = 1;
+            foreach(var dataRender in dataForPageRender)
+            {
+                Console.WriteLine($"{i} | {dataRender}");
+                i++;
+            }
+        }
+
+        //-------------------------------------------------------
+        //запускается перед каждой новой итарацией вызова
+        protected virtual void Update()
+        {
+            TakeAndOffsetForTotalPage();
         }
 
         //обработка выбора
@@ -164,7 +176,14 @@ namespace test1
             Console.WriteLine("для переключения страниц используйте стрелочки, назад - 0 или Escape");
         }
 
+        //заготовок
+        protected virtual void Title()
+        {
+
+        }
+
         //сюда кладем чего отображать
-        protected abstract void PageRender();
+        protected abstract List<string> DataForPageRender();
+
     }
 }
