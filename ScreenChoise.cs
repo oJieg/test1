@@ -20,7 +20,7 @@ namespace test1
         {
             List<string> data = new();
 
-            data.Add("из ОЗУ (данные стираются после работы");
+            data.Add("из ОЗУ (данные стираются после работы)");
             data.Add("из SQL базы данных");
             data.Add("из CVS таблици ");
             return data;
@@ -56,7 +56,7 @@ namespace test1
         {
             string nameFile = string.Empty;
 
-            if (formatFile != string.Empty)
+            if (!string.IsNullOrWhiteSpace(formatFile))
             {
                 ScreenFileSelection fileSelector = new ScreenFileSelection(2, formatFile);
                 fileSelector.MainRender();

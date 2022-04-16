@@ -87,7 +87,7 @@ namespace test1
                 Console.Clear();
                 Console.WriteLine("введите имя файла: ");
                 string? nameFile = Console.ReadLine();
-                if (!ValidationImputClass.TryValidatoinNameFile(nameFile)
+                if (!ValidationInputClass.TryValidatinNameFile(nameFile)
                     || File.Exists($@"{Directory.GetCurrentDirectory()}\DataBase\{nameFile}.{_formatFile}"))
                 {
                     MessageForNotValidInput("недопустимые ссиволы");

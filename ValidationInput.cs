@@ -4,9 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace test1
 {
-    public class ValidationImputClass
+    public class ValidationInputClass
     {
-        public static bool TryValidatoinNameFile(string? nameFile)
+        public static bool TryValidatinNameFile(string? nameFile)
         {
             //fullNameFile = string.Empty;
             if (nameFile == string.Empty || nameFile == null)

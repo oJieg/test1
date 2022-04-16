@@ -57,7 +57,7 @@ namespace test1
 
         public bool TryAddContact(string name, string? phone)
         {
-            if (!ValidationImputClass.TryValidationForbiddenInputContact(name, phone))
+            if (!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
             {
                 return false;
             }
