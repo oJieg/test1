@@ -36,7 +36,7 @@ namespace test1
 
             try
             {
-                File.AppendAllText(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n");
+                //File.AppendAllText(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n");
                 _flagTryAmout = false;
                 return true;
             }

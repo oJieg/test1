@@ -10,7 +10,7 @@ namespace test1
            // Screen screen = new Screen(1);
            // screen.MainRender();
             Console.WriteLine("_______");
-            Screen screenChoise = new ScreenChoise(1);
+            Screen screenChoise = new ScreenChoise(3);
             screenChoise.MainRender();
 
 

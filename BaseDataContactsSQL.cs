@@ -22,10 +22,10 @@ namespace test1
             {
                 return false;
             }
-
+            _dataSourceBD = $"Data Source={nameFile}";
             try
             {
-                using SqliteConnection sqlBD = new($"{nameFile}; mode=ReadWriteCreate");
+                using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWriteCreate");
                 using SqliteCommand comandBDsql =
                     new("select Type from sqlite_master WHERE type='table' and name='Contact';", sqlBD);
                 sqlBD.Open();
@@ -33,10 +33,10 @@ namespace test1
                 if (comandBDsql.ExecuteScalar() == null)
                 {
                     sqlBD.Close();
-                    File.Copy($"{nameFile}.db", $"{nameFile}Copy.db", true);
+                    File.Copy($"{nameFile}", $"{nameFile}.Copy", true);
                     CreateNewTable();
                 }
-                _dataSourceBD=nameFile;
+               // _dataSourceBD=nameFile;
                 return true;
             }
             catch (Exception)
