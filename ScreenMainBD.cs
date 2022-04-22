@@ -26,12 +26,11 @@ namespace test1
         protected override List<string> DataForPageRender()
         {
             List<string> data = new List<string>();
-            if(!_dataContacts.TryTakeContacts(_offsetForTotalNumber, _takeForTotalNumber, out List<Contact> outContact))
+            if (!_dataContacts.TryTakeContacts(_offsetForTotalNumber, _takeForTotalNumber, out List<Contact> outContact))
             {
                 MessageForNotValidInput("ошибка чтения базы данных");
-                //логи
             }
-            
+
             foreach (Contact contact in outContact)
             {
                 data.Add(contact.ToString());

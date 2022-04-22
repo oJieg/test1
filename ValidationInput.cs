@@ -8,7 +8,6 @@ namespace test1
     {
         public static bool TryValidatinNameFile(string? nameFile)
         {
-            //fullNameFile = string.Empty;
             if (nameFile == string.Empty || nameFile == null)
             {
                 return false;
@@ -18,10 +17,9 @@ namespace test1
             Regex r = new(string.Format("[{0}]", Regex.Escape(forbiddenSymbols)));
             if (!r.Match(nameFile).Success)
             {
-                //File.Create($"{nameFile}.csv").Close();
-                //fullNameFile = $"{nameFile}.csv";
                 return true;
             }
+
             return false;
         }
 
@@ -29,8 +27,8 @@ namespace test1
         {
             bool correctInput;
             Regex _validationSeparatorChar = new(";", RegexOptions.Compiled);
-            correctInput= _validationSeparatorChar.Match(inputName).Success;
-            if(inputPhone != null && correctInput)
+            correctInput = _validationSeparatorChar.Match(inputName).Success;
+            if (inputPhone != null && correctInput)
             {
                 correctInput = _validationSeparatorChar.Match(inputPhone).Success;
             }

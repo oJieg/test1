@@ -38,13 +38,13 @@ namespace test1
             switch (inputInt)
             {
                 case 1:
-                    CallBD(new BaseDataContactsTemporary(), string.Empty);
+                    CallBD(new BaseDataContactsTemporary());
                     break;
                 case 2:
-                    CallBD(new BaseDataContactsSQL(), "db");
+                    CallBD(new BaseDataContactsSQL());
                     break;
                 case 3:
-                    CallBD(new BaseDataContactsCSV(), "csv");
+                    CallBD(new BaseDataContactsCSV());
                     break;
                 default:
                     break;
@@ -52,13 +52,13 @@ namespace test1
 
         }
 
-        private void CallBD(IDataContactInterface inInterfase, string formatFile)
+        private void CallBD(IDataContactInterface inInterfase)
         {
             string nameFile = string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(formatFile))
+            if (inInterfase.FormatFile() != string.Empty)
             {
-                ScreenFileSelection fileSelector = new ScreenFileSelection(2, formatFile);
+                ScreenFileSelection fileSelector = new ScreenFileSelection(5, inInterfase);
                 fileSelector.MainRender();
                 nameFile = fileSelector.GetNameFile();
             }

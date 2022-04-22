@@ -8,15 +8,19 @@ namespace test1
     {
         private string _formatFile;
         private string[] listNameFile;
-        //private int amountOfNameFile;
-        private string _nameFile;
 
-        public ScreenFileSelection(int numberOfLinesOnRender, string formatFile)
+        private string _nameFile;
+        private const string nameDirectory = "DataBase";
+        private string fullAdresDirectory;
+        private IDataContactInterface _tupeBD;
+
+        public ScreenFileSelection(int numberOfLinesOnRender, IDataContactInterface tupeBD)
             : base(numberOfLinesOnRender)
         {
-            //_numberOfLinesOnRender = numberOfLinesOnRender;
-            _formatFile = formatFile;
+            fullAdresDirectory = Path.Combine(Directory.GetCurrentDirectory(), nameDirectory);
+            _formatFile = tupeBD.FormatFile();
             _pageCounterRender = true;
+            _tupeBD = tupeBD;
         }
 
         public string GetNameFile()
@@ -26,8 +30,8 @@ namespace test1
 
         protected override void Update()
         {
-            base.Update();
             ListNameFile();
+            base.Update();
         }
 
         protected override List<string> DataForPageRender()
@@ -48,7 +52,7 @@ namespace test1
 
         protected override void ChoiseMenuRender()
         {
-            Console.WriteLine($"выберети файл от 1 до {_numberOfLinesOnRender}, для создания нового файла выберете N, для выхода 0");
+            Console.WriteLine($"выберети файл от 1 до {_lengthForTotalNumber}, для создания нового файла выберете N, для выхода 0");
             base.ChoiseMenuRender();
         }
 
@@ -61,49 +65,35 @@ namespace test1
                 return;
             }
 
-            if (InputInt > 0 && InputInt <= _takeForTotalNumber)
+            if (InputInt > 0 && InputInt <= _lengthForTotalNumber)
             {
                 _nameFile = listNameFile[InputInt - 1 + _offsetForTotalNumber];
                 ExitScreen();
                 return;
             }
-
         }
+
         //----------------------------------------------------------------------------
         private void ListNameFile()
         {
-            if (!Directory.Exists(@"\DataBase"))
+            if (!Directory.Exists(@$"\{nameDirectory}"))
             {
-                Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\DataBase");
+                Directory.CreateDirectory(fullAdresDirectory);
             }
-            listNameFile = Directory.GetFiles(@$"{Directory.GetCurrentDirectory()}\DataBase", $"*.{_formatFile}");
+            listNameFile = Directory.GetFiles(fullAdresDirectory, $"*{_formatFile}");
             _fullAmountOfLine = listNameFile.Length;
         }
 
         private void CreateFile()
         {
-            while (true)
-            {
-                Console.Clear();
-                Console.WriteLine("введите имя файла: ");
-                string? nameFile = Console.ReadLine();
-                if (!ValidationInputClass.TryValidatinNameFile(nameFile)
-                    || File.Exists($@"{Directory.GetCurrentDirectory()}\DataBase\{nameFile}.{_formatFile}"))
-                {
-                    MessageForNotValidInput("недопустимые ссиволы");
-                    continue;
-                }
+            Console.Clear();
+            Console.WriteLine("введите имя файла: ");
+            string nameFile = string.Empty;
+            nameFile += Console.ReadLine();
 
-                try
-                {
-                    File.Create($@"{Directory.GetCurrentDirectory()}\DataBase\{nameFile}.{_formatFile}");
-                    return;
-                }
-                catch (Exception)
-                {
-                    MessageForNotValidInput("ошибка создания файла");
-                    //логи
-                }
+            if (!_tupeBD.CreateFile(nameDirectory, nameFile))
+            {
+                MessageForNotValidInput("не верное название файла, можно файл уже сушествует");
             }
         }
     }

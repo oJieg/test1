@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NLog;
 
 namespace test1
 {
@@ -11,11 +12,13 @@ namespace test1
         protected int _currentPageNumber; // открытая в данный момент страница
         protected int _offsetForTotalNumber; //offset текушей страницы
         protected int _takeForTotalNumber; //take для текушей страницы
+        protected int _lengthForTotalNumber; //сколько элементов на текущей страницы
 
         protected int _fullAmountOfLine; //в данный момент сколько строк есть в наличии для вывода
         protected bool _pageCounterRender; // выводить ли на экран отображение страницы текушей(1/5)
         private bool _exitFlag = false; //флаг выхода из окна
 
+        protected static Logger logger = LogManager.GetCurrentClassLogger();
         public Screen(int numberOfLinesOnRender)
         {
             _numberOfLinesOnRender = numberOfLinesOnRender;
@@ -32,7 +35,15 @@ namespace test1
                 Console.Clear();
                 if (_pageCounterRender)
                 {
-                    PageCounterRender();
+                    if (_totalPages == 0)
+                    {
+                        Console.WriteLine("список пуст, создайте новое");
+                    }
+                    else
+                    {
+                        PageCounterRender();
+                    }
+
                 }
                 Title();
                 PageRender(DataForPageRender());
@@ -52,30 +63,24 @@ namespace test1
         //считает сколько страниц всего в наличии
         protected void FullAmoutOfLine()
         {
-            int numberPage = _fullAmountOfLine / _numberOfLinesOnRender;
-
-            if (numberPage > 0)
-            {
-                if (_fullAmountOfLine % _numberOfLinesOnRender != 0)
-                {
-                    _totalPages = numberPage + 1;
-                }
-                else
-                {
-                    _totalPages = numberPage;
-                }
-            }
-            else
-            {
-                _totalPages = 1;
-            }
+            float numberPage = (float)_fullAmountOfLine / (float)_numberOfLinesOnRender;
+            _totalPages = (int)Math.Ceiling(numberPage);
         }
 
-        //явно возврашает первый элемент и кол-во элементов
+        //явно возврашает первый элемент и кол-во элементов для текушей страницы
         protected void TakeAndOffsetForTotalPage()
         {
             _offsetForTotalNumber = (_currentPageNumber - 1) * _numberOfLinesOnRender;
             _takeForTotalNumber = _numberOfLinesOnRender;
+            if ((_offsetForTotalNumber + _takeForTotalNumber) >= _fullAmountOfLine)
+            {
+                _lengthForTotalNumber = _fullAmountOfLine - _offsetForTotalNumber;
+            }
+            else
+            {
+                _lengthForTotalNumber = _numberOfLinesOnRender;
+            }
+
         }
 
         protected void MessageForNotValidInput(string message)
@@ -120,17 +125,18 @@ namespace test1
                 }
                 catch (Exception ex)
                 {
-                    //логи
+                    logger.Warn("Произошла ошибка конвертации названия клавиши в цифровое представление." +
+                        $"нажата клавиша {InputString}, сообщенио ошибки: {ex}");
                 }
             }
             InputInt = -1;
-        }   
-        
+        }
+
         //метод красивого отображения)
         protected void PageRender(List<string> dataForPageRender)
         {
             int i = 1;
-            foreach(var dataRender in dataForPageRender)
+            foreach (var dataRender in dataForPageRender)
             {
                 Console.WriteLine($"{i} | {dataRender}");
                 i++;

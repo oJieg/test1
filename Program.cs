@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.IO;
+using NLog;
 
 namespace test1
 {
@@ -7,7 +9,8 @@ namespace test1
     {
         static void Main(string[] args)
         {
-            Screen screenChoise = new ScreenChoise(3);
+            int numberOfLinesOnRender = 4;
+            Screen screenChoise = new ScreenChoise(numberOfLinesOnRender);
             screenChoise.MainRender();
         }
     }

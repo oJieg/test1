@@ -3,16 +3,22 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
+using NLog;
+
 
 namespace test1
 {
 
     public class BaseDataContactsCSV : IDataContactInterface
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        private const string formatFile = ".csv";
+
         private string _nameFile = string.Empty;
         private int _countLine = 0;
         private readonly Regex _separatorChar = new("[^;]+", RegexOptions.Compiled);
-        
+
         private bool _flagTryAmout = false;
         private int _amoutOfContact = 0;
 
@@ -20,6 +26,7 @@ namespace test1
         {
             if (!File.Exists(nameFile))
             {
+                logger.Error($"При иниацилизации указаный файл не найден(файл -{nameFile})");
                 return false;
             }
             _nameFile = nameFile;
@@ -29,7 +36,7 @@ namespace test1
 
         public bool TryAddContact(string name, string? phone)
         {
-            if(!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
+            if (!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
             {
                 return false;
             }
@@ -40,8 +47,10 @@ namespace test1
                 _flagTryAmout = false;
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                logger.Error($"Ошибка записи в файл -{_nameFile}, для данных имя-{name}, телефон {phone}," +
+                    $"Ошибка {ex}");
                 return false;
             }
         }
@@ -49,6 +58,13 @@ namespace test1
         public bool TryTakeContacts(int offset, int take, out List<Contact> outContacts)
         {
             outContacts = new();
+
+            if (offset < 0 && offset > AmountOfContact())
+            {
+                logger.Error($"не верные offset({offset}) и take({take}) в методе TryTakeContacts(.csv)");
+                return false;
+            }
+
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             try
             {
@@ -63,7 +79,7 @@ namespace test1
                         outContacts.Add(ParsLineInContact(readLine));
                     }
 
-                    if(takeAndOffset < i)
+                    if (takeAndOffset < i)
                     {
                         break;
                     }
@@ -74,14 +90,15 @@ namespace test1
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.Error($"ошибка чтения файла {_nameFile} для элементов с " +
+                    $"{offset}, {take}-количество элементов. Ошибка: {ex}");
                 return false;
             }
         }
 
         public int AmountOfContact()
         {
-            if(_flagTryAmout)
+            if (_flagTryAmout)
             {
                 return _amoutOfContact;
             }
@@ -98,23 +115,50 @@ namespace test1
                 _amoutOfContact = _countLine;
                 return _countLine;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                logger.Error($"ошибка чтения файла {_nameFile} при подсчете количества контактов. Ошибка: {ex}");
                 return 0;
             }
+        }
+
+        public bool CreateFile(string directory, string nameFile)
+        {
+            string fullName = Path.Combine(Directory.GetCurrentDirectory(), directory, $"{nameFile}.csv");
+
+            if (ValidationInputClass.TryValidatinNameFile(nameFile)
+    && !File.Exists(fullName))
+            {
+                try
+                {
+                    File.Create(fullName).Close();
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn($"не удалось создать файл {nameFile} csv. {ex}");
+                }
+            }
+            return false;
+        }
+
+        public string FormatFile()
+        {
+            return formatFile;
         }
 
         private Contact ParsLineInContact(string line)
         {
             MatchCollection matches = _separatorChar.Matches(line);
-             
+
             string firstWord = TrimEscapeChar(matches[0].Value);
             string secondWord = String.Empty;
             if (matches.Count > 1)
             {
                 secondWord = TrimEscapeChar(matches[1].Value);
             }
-            if(line[0] == ';')
+            if (line[0] == ';')
             {
                 return new Contact(" ", firstWord);
             }
@@ -124,7 +168,7 @@ namespace test1
 
         private static string TrimEscapeChar(string word)
         {
-            word = Regex.Replace(word,"\"\"", "\"");
+            word = Regex.Replace(word, "\"\"", "\"");
             char charEscape = '\"';
             return word.Trim(charEscape);
         }
@@ -135,7 +179,7 @@ namespace test1
             {
                 return null;
             }
-           return Regex.Replace(word, "\"", "\"\"");
+            return Regex.Replace(word, "\"", "\"\"");
         }
     }
 }
