@@ -10,13 +10,13 @@ namespace test1
             : base(numberOfLinesOnRender)
         {
             _dataContacts = dataContacts;
-            _pageCounterRender = true;
+            PageCounter = true;
         }
 
         protected override void Update()
         {
             base.Update();
-            _fullAmountOfLine = _dataContacts.AmountOfContact();
+            FullAmountOfLines = _dataContacts.AmountOfContact();
         }
         protected override void Title()
         {
@@ -25,8 +25,8 @@ namespace test1
 
         protected override List<string> DataForPageRender()
         {
-            List<string> data = new List<string>();
-            if (!_dataContacts.TryTakeContacts(_offsetForTotalNumber, _takeForTotalNumber, out List<Contact> outContact))
+            List<string> data = new List<string>(TakeForTotalNumber);
+            if (!_dataContacts.TryTakeContacts(OffsetForTotalNumber, TakeForTotalNumber, out List<Contact> outContact))
             {
                 MessageForNotValidInput("ошибка чтения базы данных");
             }
@@ -44,9 +44,9 @@ namespace test1
             Console.WriteLine("N - добавить новый контакт, Т- тестовые контакты");
         }
 
-        protected override void ChoiseInpyt(int InputInt, string InputString)
+        protected override void ChoiceInput(int InputInt, string InputString)
         {
-            base.ChoiseInpyt(InputInt, InputString);
+            base.ChoiceInput(InputInt, InputString);
             if (InputString == "t" || InputString == "T")
             {
                 for (int i = 0; i < 5; i++)
@@ -74,7 +74,14 @@ namespace test1
             Console.Clear();
             Console.WriteLine("ввидите телефон");
             string? phone = Console.ReadLine();
-            _dataContacts.TryAddContact(name, phone);
+
+            if (!_dataContacts.TryAddContact(name, phone))
+            {
+                logger.Error("Не удалось добавить контакт, " +
+    $"в имени или телефоне есть запрешенные символы name - {name}, phone - {phone}");
+                MessageForNotValidInput("Не удалось добавить контакт." +
+                    "В имени или телефоне присудствуют запрешенные символ - ;");
+            }
         }
     }
 }

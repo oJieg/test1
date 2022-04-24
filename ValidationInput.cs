@@ -27,12 +27,12 @@ namespace test1
         {
             bool correctInput;
             Regex _validationSeparatorChar = new(";", RegexOptions.Compiled);
-            correctInput = _validationSeparatorChar.Match(inputName).Success;
+            correctInput = !_validationSeparatorChar.Match(inputName).Success;
             if (inputPhone != null && correctInput)
             {
-                correctInput = _validationSeparatorChar.Match(inputPhone).Success;
+                correctInput = !_validationSeparatorChar.Match(inputPhone).Success;
             }
-            return !correctInput;
+            return correctInput;
         }
     }
 }

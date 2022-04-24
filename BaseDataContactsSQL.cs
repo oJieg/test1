@@ -73,7 +73,6 @@ namespace test1
         {
             if (!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
             {
-                logger.Warn($"не корктные данные для ввода {name}, {phone}");
                 return false;
             }
 

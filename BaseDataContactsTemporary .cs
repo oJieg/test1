@@ -18,20 +18,14 @@ namespace test1
         {
             if (!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
             {
-                logger.Warn($"не корктные данные для ввода {name}, {phone}");
                 return false;
             }
 
             try
             {
-                if (string.IsNullOrWhiteSpace(phone))
-                {
-                    _contacts.Add(new Contact(name));
-                }
-                else
-                {
-                    _contacts.Add(new Contact(name, phone));
-                }
+
+                _contacts.Add(new Contact(name, phone));
+
                 return true;
             }
             catch (Exception ex)

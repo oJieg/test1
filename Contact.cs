@@ -11,12 +11,6 @@
             Phone = phone;
         }
 
-        public Contact(string name)
-        {
-            Name = name;
-            Phone = "none";
-        }
-
         public override string ToString()
         {
             return $"{Name}-->{Phone}";

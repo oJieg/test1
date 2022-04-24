@@ -6,23 +6,23 @@ namespace test1
 {
     public abstract class Screen
     {
-        protected int _numberOfLinesOnRender; //сколько строк на одном экране
-        protected int _totalPages; // сколько всего страниц
+        protected int NumberOfLinesOnRender { get; private set; } //сколько строк на одном экране
+        protected int TotalPages { get; private set; }// сколько всего страниц
 
-        protected int _currentPageNumber; // открытая в данный момент страница
-        protected int _offsetForTotalNumber; //offset текушей страницы
-        protected int _takeForTotalNumber; //take для текушей страницы
-        protected int _lengthForTotalNumber; //сколько элементов на текущей страницы
+        protected int CurrentPageNumber { get; private set; }// открытая в данный момент страница
+        protected int OffsetForTotalNumber { get; private set; } //offset текушей страницы
+        protected int TakeForTotalNumber { get; private set; }//take для текушей страницы
+        protected int LengthForTotalNumber { get; private set; } //сколько элементов на текущей страницы
 
-        protected int _fullAmountOfLine; //в данный момент сколько строк есть в наличии для вывода
-        protected bool _pageCounterRender; // выводить ли на экран отображение страницы текушей(1/5)
+        protected int FullAmountOfLines { get; set; } //в данный момент сколько строк есть в наличии для вывода
+        protected bool PageCounter { get; set; } // выводить ли на экран отображение страницы текушей(1/5)
         private bool _exitFlag = false; //флаг выхода из окна
 
         protected static Logger logger = LogManager.GetCurrentClassLogger();
         public Screen(int numberOfLinesOnRender)
         {
-            _numberOfLinesOnRender = numberOfLinesOnRender;
-            _currentPageNumber = 1;
+            this.NumberOfLinesOnRender = numberOfLinesOnRender;
+            CurrentPageNumber = 1;
         }
 
         //главный метод который нужно вызывать
@@ -33,9 +33,9 @@ namespace test1
                 Update();
                 FullAmoutOfLine();
                 Console.Clear();
-                if (_pageCounterRender)
+                if (PageCounter)
                 {
-                    if (_totalPages == 0)
+                    if (TotalPages == 0)
                     {
                         Console.WriteLine("список пуст, создайте новое");
                     }
@@ -50,37 +50,36 @@ namespace test1
                 ChoiseMenuRender();
 
                 KeyInput(out int InputInt, out string InputString);
-                ChoiseInpyt(InputInt, InputString);
+                ChoiceInput(InputInt, InputString);
             }
         }
 
         //рендер тукушей стоницы (1/5)
         protected void PageCounterRender()
         {
-            Console.WriteLine($"{_currentPageNumber}/{_totalPages}");
+            Console.WriteLine($"{CurrentPageNumber}/{TotalPages}");
         }
 
         //считает сколько страниц всего в наличии
         protected void FullAmoutOfLine()
         {
-            float numberPage = (float)_fullAmountOfLine / (float)_numberOfLinesOnRender;
-            _totalPages = (int)Math.Ceiling(numberPage);
+            float numberPage = (float)FullAmountOfLines / (float)NumberOfLinesOnRender;
+            TotalPages = (int)Math.Ceiling(numberPage);
         }
 
         //явно возврашает первый элемент и кол-во элементов для текушей страницы
         protected void TakeAndOffsetForTotalPage()
         {
-            _offsetForTotalNumber = (_currentPageNumber - 1) * _numberOfLinesOnRender;
-            _takeForTotalNumber = _numberOfLinesOnRender;
-            if ((_offsetForTotalNumber + _takeForTotalNumber) >= _fullAmountOfLine)
+            OffsetForTotalNumber = (CurrentPageNumber - 1) * NumberOfLinesOnRender;
+            TakeForTotalNumber = NumberOfLinesOnRender;
+            if ((OffsetForTotalNumber + TakeForTotalNumber) >= FullAmountOfLines)
             {
-                _lengthForTotalNumber = _fullAmountOfLine - _offsetForTotalNumber;
+                LengthForTotalNumber = FullAmountOfLines - OffsetForTotalNumber;
             }
             else
             {
-                _lengthForTotalNumber = _numberOfLinesOnRender;
+                LengthForTotalNumber = NumberOfLinesOnRender;
             }
-
         }
 
         protected void MessageForNotValidInput(string message)
@@ -97,25 +96,25 @@ namespace test1
 
         protected void NextPage()
         {
-            if (_currentPageNumber < _totalPages)
+            if (CurrentPageNumber < TotalPages)
             {
-                _currentPageNumber++;
+                CurrentPageNumber++;
             }
         }
 
         protected void PreviousPage()
         {
-            if (_currentPageNumber > 1)
+            if (CurrentPageNumber > 1)
             {
-                _currentPageNumber--;
+                CurrentPageNumber--;
             }
         }
 
         protected void KeyInput(out int InputInt, out string InputString)
         {
-            ConsoleKeyInfo kay = Console.ReadKey();
+            ConsoleKeyInfo key = Console.ReadKey();
 
-            InputString = kay.Key.ToString();
+            InputString = key.Key.ToString();
             if (InputString.Length > 1 && (InputString.Remove(1) == "D" || InputString.Remove(3) == "Num"))
             {
                 try
@@ -151,7 +150,7 @@ namespace test1
         }
 
         //обработка выбора
-        protected virtual void ChoiseInpyt(int inputInt, string inputString)
+        protected virtual void ChoiceInput(int inputInt, string inputString)
         {
             if (inputString == "RightArrow")
             {
@@ -173,7 +172,8 @@ namespace test1
         //рендер меню выбора
         protected virtual void ChoiseMenuRender()
         {
-            Console.WriteLine("для переключения страниц используйте стрелочки, назад - 0 или Escape");
+            Console.WriteLine("Стрелочки на клавиатуре - переход по страницам, 0 или Escape - вернуться на предыдушее окно выбора");
+            Console.WriteLine($"выберети пункт от 1 до { LengthForTotalNumber}");
         }
 
         //заготовок

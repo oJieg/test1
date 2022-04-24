@@ -43,7 +43,7 @@ namespace test1
 
             try
             {
-                File.AppendAllText(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n");
+                File.AppendAllText(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n", Encoding.GetEncoding(1251));
                 _flagTryAmout = false;
                 return true;
             }
@@ -150,19 +150,15 @@ namespace test1
 
         private Contact ParsLineInContact(string line)
         {
-            MatchCollection matches = _separatorChar.Matches(line);
+            //MatchCollection matches = _separatorChar.Matches(line);
+            string[] matches = line.Split(";");
 
-            string firstWord = TrimEscapeChar(matches[0].Value);
+            string firstWord = TrimEscapeChar(matches[0]);
             string secondWord = String.Empty;
-            if (matches.Count > 1)
+            if (matches.Length > 1)
             {
-                secondWord = TrimEscapeChar(matches[1].Value);
+                secondWord = TrimEscapeChar(matches[1]);
             }
-            if (line[0] == ';')
-            {
-                return new Contact(" ", firstWord);
-            }
-
             return new Contact(firstWord, secondWord);
         }
 
@@ -175,10 +171,6 @@ namespace test1
 
         private static string? AddEscapeChar(string? word)
         {
-            if (word == null)
-            {
-                return null;
-            }
             return Regex.Replace(word, "\"", "\"\"");
         }
     }

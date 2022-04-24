@@ -10,7 +10,7 @@ namespace test1
         static void Main(string[] args)
         {
             int numberOfLinesOnRender = 4;
-            Screen screenChoise = new ScreenChoise(numberOfLinesOnRender);
+            Screen screenChoise = new ScreenSelect(numberOfLinesOnRender);
             screenChoise.MainRender();
         }
     }

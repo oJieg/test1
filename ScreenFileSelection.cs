@@ -19,13 +19,8 @@ namespace test1
         {
             fullAdresDirectory = Path.Combine(Directory.GetCurrentDirectory(), nameDirectory);
             _formatFile = tupeBD.FormatFile();
-            _pageCounterRender = true;
+            PageCounter = true;
             _tupeBD = tupeBD;
-        }
-
-        public string GetNameFile()
-        {
-            return _nameFile;
         }
 
         protected override void Update()
@@ -36,14 +31,14 @@ namespace test1
 
         protected override List<string> DataForPageRender()
         {
-            int takeAndOffset = _offsetForTotalNumber + _takeForTotalNumber;
-            if (takeAndOffset > _fullAmountOfLine)
+            int takeAndOffset = OffsetForTotalNumber + TakeForTotalNumber;
+            if (takeAndOffset > FullAmountOfLines)
             {
-                takeAndOffset = _fullAmountOfLine;
+                takeAndOffset = FullAmountOfLines;
             }
             List<string> data = new();
 
-            for (int i = _offsetForTotalNumber; i < takeAndOffset; i++)
+            for (int i = OffsetForTotalNumber; i < takeAndOffset; i++)
             {
                 data.Add(Path.GetFileName(listNameFile[i]));
             }
@@ -52,23 +47,30 @@ namespace test1
 
         protected override void ChoiseMenuRender()
         {
-            Console.WriteLine($"выберети файл от 1 до {_lengthForTotalNumber}, для создания нового файла выберете N, для выхода 0");
+            Console.WriteLine($"Для создания нового файла выберете N");
             base.ChoiseMenuRender();
         }
 
-        protected override void ChoiseInpyt(int InputInt, string InputString)
+        protected override void ChoiceInput(int InputInt, string InputString)
         {
-            base.ChoiseInpyt(InputInt, InputString);
+            base.ChoiceInput(InputInt, InputString);
             if (InputString == "n" || InputString == "N")
             {
                 CreateFile();
                 return;
             }
 
-            if (InputInt > 0 && InputInt <= _lengthForTotalNumber)
+            if (InputInt > 0 && InputInt <= LengthForTotalNumber)
             {
-                _nameFile = listNameFile[InputInt - 1 + _offsetForTotalNumber];
-                ExitScreen();
+                _nameFile = listNameFile[InputInt - 1 + OffsetForTotalNumber];
+                if (_tupeBD.TryInitializationDB(_nameFile))
+                {
+                    logger.Debug($"Откытие: {_nameFile}");
+
+                    ScreenMainBD screenMainBD = new ScreenMainBD(NumberOfLinesOnRender, _tupeBD);
+                    screenMainBD.MainRender();
+                }
+                //ExitScreen();
                 return;
             }
         }
@@ -76,12 +78,12 @@ namespace test1
         //----------------------------------------------------------------------------
         private void ListNameFile()
         {
-            if (!Directory.Exists(@$"\{nameDirectory}"))
+            if (!Directory.Exists(fullAdresDirectory)
             {
                 Directory.CreateDirectory(fullAdresDirectory);
             }
             listNameFile = Directory.GetFiles(fullAdresDirectory, $"*{_formatFile}");
-            _fullAmountOfLine = listNameFile.Length;
+            FullAmountOfLines = listNameFile.Length;
         }
 
         private void CreateFile()
