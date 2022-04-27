@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace test1
 {
     public class ScreenFileSelection : Screen
     {
-        private string _formatFile;
+        private readonly string _formatFile;
         private string[] listNameFile;
 
         private string _nameFile;
         private const string nameDirectory = "DataBase";
-        private string fullAdresDirectory;
-        private IDataContactInterface _tupeBD;
+        private readonly string fullAdresDirectory;
+        private readonly IDataContactInterface _tupeBD;
 
-        public ScreenFileSelection(int numberOfLinesOnRender, IDataContactInterface tupeBD)
-            : base(numberOfLinesOnRender)
+        public ScreenFileSelection(int numberOfLinesOnRender, IDataContactInterface tupeBD, ILogger logger)
+            : base(numberOfLinesOnRender, logger)
         {
             fullAdresDirectory = Path.Combine(Directory.GetCurrentDirectory(), nameDirectory);
             _formatFile = tupeBD.FormatFile();
@@ -36,11 +37,22 @@ namespace test1
             {
                 takeAndOffset = FullAmountOfLines;
             }
-            List<string> data = new();
+            List<string> data = new(takeAndOffset);
 
-            for (int i = OffsetForTotalNumber; i < takeAndOffset; i++)
+            try
             {
-                data.Add(Path.GetFileName(listNameFile[i]));
+                for (int i = OffsetForTotalNumber; i < takeAndOffset; i++)
+                {
+                    data.Add(Path.GetFileName(listNameFile[i]));
+                }
+            }
+            catch (IndexOutOfRangeException ex)
+            {
+                Logger.LogCritical(ex, "Произошло обрашение к не сушествующему элементу массива listNameFile.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, "ошибка получения списка для рендера его.");
             }
             return data;
         }
@@ -62,13 +74,20 @@ namespace test1
 
             if (InputInt > 0 && InputInt <= LengthForTotalNumber)
             {
-                _nameFile = listNameFile[InputInt - 1 + OffsetForTotalNumber];
-                if (_tupeBD.TryInitializationDB(_nameFile))
+                try
                 {
-                    logger.Debug($"Откытие: {_nameFile}");
+                    _nameFile = listNameFile[InputInt - 1 + OffsetForTotalNumber];
+                    if (_tupeBD.TryInitializationDB(_nameFile))
+                    {
+                        Logger.LogInformation("Откытие: {_nameFile}", _nameFile);
 
-                    ScreenMainBD screenMainBD = new ScreenMainBD(NumberOfLinesOnRender, _tupeBD);
-                    screenMainBD.MainRender();
+                        ScreenMainBD screenMainBD = new(NumberOfLinesOnRender, _tupeBD, Logger);
+                        screenMainBD.MainRender();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "ошибка при выборе файла из списка");
                 }
                 //ExitScreen();
                 return;
@@ -78,12 +97,29 @@ namespace test1
         //----------------------------------------------------------------------------
         private void ListNameFile()
         {
-            if (!Directory.Exists(fullAdresDirectory)
+            try
             {
-                Directory.CreateDirectory(fullAdresDirectory);
+                if (!Directory.Exists(fullAdresDirectory))
+                {
+                    Directory.CreateDirectory(fullAdresDirectory);
+                    Logger.LogInformation("директория {fullAdresDirectory} создана", fullAdresDirectory);
+                }
+                listNameFile = Directory.GetFiles(fullAdresDirectory, $"*{_formatFile}");
+                FullAmountOfLines = listNameFile.Length;
             }
-            listNameFile = Directory.GetFiles(fullAdresDirectory, $"*{_formatFile}");
-            FullAmountOfLines = listNameFile.Length;
+            catch (IOException ex)
+            {
+                Logger.LogError(ex, "Каталог, заданный {fullAdresDirectory}, является файлом. " +
+                    "Или  Имя сети неизвестно.", fullAdresDirectory);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Logger.LogError(ex, "У вызывающего объекта Directory.CreateDirectory отсутствует необходимое разрешение.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "ошибка получения списка файлов с расширением {_formatFile}", _formatFile);
+            }
         }
 
         private void CreateFile()
@@ -93,9 +129,9 @@ namespace test1
             string nameFile = string.Empty;
             nameFile += Console.ReadLine();
 
-            if (!_tupeBD.CreateFile(nameDirectory, nameFile))
+            if (_tupeBD.CreateFile(nameDirectory, nameFile))
             {
-                MessageForNotValidInput("не верное название файла, можно файл уже сушествует");
+                Logger.LogInformation("был успешно создан файл {nameFile}", nameFile);
             }
         }
     }

@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace test1
 {
     public class BaseDataContactsTemporary : IDataContactInterface
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        // private static Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger _logger;
+
+        public BaseDataContactsTemporary(ILogger logger)
+        {
+            _logger = logger;
+        }
 
         private readonly List<Contact> _contacts = new();
         public bool TryInitializationDB(string? nameFile)
@@ -18,19 +24,19 @@ namespace test1
         {
             if (!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
             {
+                _logger.LogWarning("Не верные данные пользователя name - {name} phone - {phone}", name, phone);
                 return false;
             }
 
             try
             {
-
                 _contacts.Add(new Contact(name, phone));
 
                 return true;
             }
             catch (Exception ex)
             {
-                logger.Error($"не удалось создать контакт в памяти {name}, {phone}. Ошибка: {ex}");
+                _logger.LogError(ex, "Не удалось создать контакт в памяти {name}, {phone}.", name, phone);
                 return false;
             }
         }
@@ -41,19 +47,28 @@ namespace test1
             int amoutOfContact = AmountOfContact();
             if (offset < 0 || offset > amoutOfContact)
             {
-                logger.Error($"не верные offset({offset}) и take({take}) в методе TryTakeContacts(в памяти)");
+                _logger.LogError("не верные offset({offset}) и take({take}) в методе TryTakeContacts(в памяти)", offset, take);
                 return false;
             }
-            if (amoutOfContact < offset + take)
-            {
-                take = amoutOfContact - offset;
-            }
 
-            foreach (Contact contact in _contacts.GetRange(offset, take))
+            try
             {
-                outContacts.Add(contact);
+                if (amoutOfContact < offset + take)
+                {
+                    take = amoutOfContact - offset;
+                }
+                foreach (Contact contact in _contacts.GetRange(offset, take))
+                {
+                    outContacts.Add(contact);
+                }
+                return true;
             }
-            return true;
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "ошибка чтения файла  для элементов с " +
+    "{offset}, {take}-количество элементов.", offset, take);
+                return false;
+            }
         }
 
         public int AmountOfContact()

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace test1
 {
@@ -18,11 +18,17 @@ namespace test1
         protected bool PageCounter { get; set; } // выводить ли на экран отображение страницы текушей(1/5)
         private bool _exitFlag = false; //флаг выхода из окна
 
-        protected static Logger logger = LogManager.GetCurrentClassLogger();
-        public Screen(int numberOfLinesOnRender)
+        protected ILogger Logger { get; }
+        public Screen(int numberOfLinesOnRender, ILogger loger)
         {
+            if(numberOfLinesOnRender == 0)
+            {
+                loger.LogCritical("Конструктор Screen не может принимать numberOfLinesOnRender = 0"); 
+                throw new ArgumentException("numberOfLinesOnRender не может быть нулем");
+            }
             this.NumberOfLinesOnRender = numberOfLinesOnRender;
             CurrentPageNumber = 1;
+            Logger = loger;
         }
 
         //главный метод который нужно вызывать
@@ -82,7 +88,7 @@ namespace test1
             }
         }
 
-        protected void MessageForNotValidInput(string message)
+        protected static void MessageForNotValidInput(string message)
         {
             Console.WriteLine($"{message}, Для продлжения нажмите любую клавишу");
             Console.ReadKey();
@@ -119,20 +125,20 @@ namespace test1
             {
                 try
                 {
-                    InputInt = Convert.ToInt32(InputString[InputString.Length - 1].ToString());
+                    InputInt = Convert.ToInt32(InputString[^1].ToString());
                     return;
                 }
                 catch (Exception ex)
                 {
-                    logger.Warn("Произошла ошибка конвертации названия клавиши в цифровое представление." +
-                        $"нажата клавиша {InputString}, сообщенио ошибки: {ex}");
+                    Logger.LogError(ex, "Произошла ошибка конвертации названия клавиши в цифровое представление." +
+                        "нажата клавиша {InputString}.", InputString);
                 }
             }
             InputInt = -1;
         }
 
         //метод красивого отображения)
-        protected void PageRender(List<string> dataForPageRender)
+        protected static void PageRender(List<string> dataForPageRender)
         {
             int i = 1;
             foreach (var dataRender in dataForPageRender)

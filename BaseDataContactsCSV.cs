@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 
 namespace test1
@@ -11,26 +11,38 @@ namespace test1
 
     public class BaseDataContactsCSV : IDataContactInterface
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger _logger;
 
         private const string formatFile = ".csv";
 
         private string _nameFile = string.Empty;
         private int _countLine = 0;
-        private readonly Regex _separatorChar = new("[^;]+", RegexOptions.Compiled);
 
         private bool _flagTryAmout = false;
         private int _amoutOfContact = 0;
 
+        public BaseDataContactsCSV(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         public bool TryInitializationDB(string nameFile)
         {
-            if (!File.Exists(nameFile))
+            try
             {
-                logger.Error($"При иниацилизации указаный файл не найден(файл -{nameFile})");
+                if (!File.Exists(nameFile))
+                {
+                    _logger.LogError("При иниацилизации указаный файл не найден(файл - {nameFile})", nameFile);
+                    return false;
+                }
+                _nameFile = nameFile;
+                _countLine = AmountOfContact();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ошибка иниацилизации BaseDataContactsCSV");
                 return false;
             }
-            _nameFile = nameFile;
-            _countLine = AmountOfContact();
             return true;
         }
 
@@ -38,6 +50,7 @@ namespace test1
         {
             if (!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
             {
+                _logger.LogWarning("Не верные данные пользователя name - {name} phone - {phone}", name, phone);
                 return false;
             }
 
@@ -49,8 +62,8 @@ namespace test1
             }
             catch (Exception ex)
             {
-                logger.Error($"Ошибка записи в файл -{_nameFile}, для данных имя-{name}, телефон {phone}," +
-                    $"Ошибка {ex}");
+                _logger.LogError(ex, "Ошибка записи в файл -{_nameFile}, для данных имя-{name}, телефон {phone}",
+                    _nameFile, name, phone);
                 return false;
             }
         }
@@ -58,16 +71,15 @@ namespace test1
         public bool TryTakeContacts(int offset, int take, out List<Contact> outContacts)
         {
             outContacts = new();
-
             if (offset < 0 && offset > AmountOfContact())
             {
-                logger.Error($"не верные offset({offset}) и take({take}) в методе TryTakeContacts(.csv)");
+                _logger.LogError("не верные offset({offset}) и take({take}) в методе TryTakeContacts(.csv)", offset, take);
                 return false;
             }
 
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             try
             {
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                 using StreamReader fileRead = new(_nameFile, Encoding.GetEncoding(1251));
                 int i = 0;
                 string? readLine = "";
@@ -90,8 +102,8 @@ namespace test1
             }
             catch (Exception ex)
             {
-                logger.Error($"ошибка чтения файла {_nameFile} для элементов с " +
-                    $"{offset}, {take}-количество элементов. Ошибка: {ex}");
+                _logger.LogError(ex, "ошибка чтения файла {_nameFile} для элементов с " +
+                    "{offset}, {take}-количество элементов.", _nameFile, offset, take);
                 return false;
             }
         }
@@ -117,7 +129,7 @@ namespace test1
             }
             catch (Exception ex)
             {
-                logger.Error($"ошибка чтения файла {_nameFile} при подсчете количества контактов. Ошибка: {ex}");
+                _logger.LogError(ex, "ошибка чтения файла {_nameFile} при подсчете количества контактов." , _nameFile);
                 return 0;
             }
         }
@@ -137,9 +149,11 @@ namespace test1
                 }
                 catch (Exception ex)
                 {
-                    logger.Warn($"не удалось создать файл {nameFile} csv. {ex}");
+                    _logger.LogWarning(ex, "не удалось создать файл {nameFile} csv.", nameFile);
                 }
             }
+            _logger.LogWarning("Была неудачная попытка создать файл {nameFile}. " +
+                "Имя файла состоит из запрешенных символов или такой файл уже есть.", nameFile);
             return false;
         }
 
@@ -148,9 +162,8 @@ namespace test1
             return formatFile;
         }
 
-        private Contact ParsLineInContact(string line)
+        private static Contact ParsLineInContact(string line)
         {
-            //MatchCollection matches = _separatorChar.Matches(line);
             string[] matches = line.Split(";");
 
             string firstWord = TrimEscapeChar(matches[0]);

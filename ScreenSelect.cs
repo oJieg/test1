@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace test1
 {
     public class ScreenSelect : Screen
     {
-        private List<string> _data = new();
-        public ScreenSelect(int numberOfLinesOnRender)
-            : base(numberOfLinesOnRender)
+        private readonly List<string> _data = new();
+        public ScreenSelect(int numberOfLinesOnRender, ILogger logger)
+            : base(numberOfLinesOnRender, logger)
         {
             AddDataForRener();
             FullAmountOfLines = _data.Count;
@@ -37,14 +38,15 @@ namespace test1
             switch (inputInt)
             {
                 case 1:
-                    ScreenMainBD screenMainBD = new ScreenMainBD(NumberOfLinesOnRender, new BaseDataContactsTemporary());
+                    ScreenMainBD screenMainBD = 
+                        new(NumberOfLinesOnRender, new BaseDataContactsTemporary(Logger), Logger);
                     screenMainBD.MainRender();
                     break;
                 case 2:
-                    CallScreenFileSelection(new BaseDataContactsSQL());
+                    CallScreenFileSelection(new BaseDataContactsSQL(Logger));
                     break;
                 case 3:
-                    CallScreenFileSelection(new BaseDataContactsCSV());
+                    CallScreenFileSelection(new BaseDataContactsCSV(Logger));
                     break;
                 default:
                     break;
@@ -53,7 +55,7 @@ namespace test1
 
         private void CallScreenFileSelection(IDataContactInterface inInterfase)
         {
-            ScreenFileSelection fileSelector = new ScreenFileSelection(NumberOfLinesOnRender, inInterfase);
+            ScreenFileSelection fileSelector = new(NumberOfLinesOnRender, inInterfase, Logger);
             fileSelector.MainRender();
         }
     }

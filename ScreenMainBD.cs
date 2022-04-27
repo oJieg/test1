@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace test1
 {
     internal class ScreenMainBD : Screen
     {
         private readonly IDataContactInterface _dataContacts;
-        public ScreenMainBD(int numberOfLinesOnRender, IDataContactInterface dataContacts)
-            : base(numberOfLinesOnRender)
+        public ScreenMainBD(int numberOfLinesOnRender, IDataContactInterface dataContacts, ILogger logger)
+            : base(numberOfLinesOnRender, logger)
         {
             _dataContacts = dataContacts;
             PageCounter = true;
@@ -25,10 +26,11 @@ namespace test1
 
         protected override List<string> DataForPageRender()
         {
-            List<string> data = new List<string>(TakeForTotalNumber);
+            List<string> data = new(TakeForTotalNumber);
             if (!_dataContacts.TryTakeContacts(OffsetForTotalNumber, TakeForTotalNumber, out List<Contact> outContact))
             {
-                MessageForNotValidInput("ошибка чтения базы данных");
+                Logger.LogError("Ошибка чтения базы данных");
+                MessageForNotValidInput("Ошибка чтения базы данных");
             }
 
             foreach (Contact contact in outContact)
@@ -66,22 +68,29 @@ namespace test1
             Console.WriteLine("1 или пустая строка - отмена ");
             Console.WriteLine("ввидите имя:");
 
-            string? name = Console.ReadLine();
-            if (name == "1" || string.IsNullOrWhiteSpace(name))
+            try
             {
-                return;
-            }
-            Console.Clear();
-            Console.WriteLine("ввидите телефон");
-            string? phone = Console.ReadLine();
+                string? name = Console.ReadLine();
+                if (name == "1" || string.IsNullOrWhiteSpace(name))
+                {
+                    return;
+                }
+                Console.Clear();
+                Console.WriteLine("ввидите телефон");
+                string? phone = Console.ReadLine();
 
-            if (!_dataContacts.TryAddContact(name, phone))
-            {
-                logger.Error("Не удалось добавить контакт, " +
-    $"в имени или телефоне есть запрешенные символы name - {name}, phone - {phone}");
-                MessageForNotValidInput("Не удалось добавить контакт." +
-                    "В имени или телефоне присудствуют запрешенные символ - ;");
+                if (!_dataContacts.TryAddContact(name, phone))
+                {
+                    Logger.LogError("Не удалось добавить контакт, " +
+        "в имени или телефоне есть запрешенные символы name - {name}, phone - {phone}", name, phone);
+                    MessageForNotValidInput("Не удалось добавить контакт." +
+                        "В имени или телефоне присудствуют запрешенные символ - ;");
+                }
             }
-        }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "ошибка интерфейса добавления контакта");
+            }
+    }
     }
 }

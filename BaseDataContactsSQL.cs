@@ -4,22 +4,27 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace test1
 {
     public class BaseDataContactsSQL : IDataContactInterface
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger _logger;
 
         private string _dataSourceBD = String.Empty;
         private const string formatFile = ".db";
+
+        public BaseDataContactsSQL(ILogger logger)
+        {
+            _logger = logger;
+        }
 
         public bool TryInitializationDB(string nameFile)
         {
             if (!File.Exists(nameFile))
             {
-                logger.Error($"При иниацилизации указаный файл не найден(файл -{nameFile})");
+                _logger.LogError("При иниацилизации указаный файл не найден(файл -{nameFile})", nameFile);
                 return false;
             }
             _dataSourceBD = $"Data Source={nameFile}";
@@ -34,18 +39,18 @@ namespace test1
                 {
                     sqlBD.Close();
                     File.Copy($"{nameFile}", $"{nameFile}.Copy", true);
-                    logger.Warn($"Файл {nameFile} имеет не корректную структуру, " +
-                        $"он был переименован и создан новый");
+                    _logger.LogInformation("Файл {nameFile} имеет не корректную структуру, " +
+                        "он был переименован и создан новый", nameFile);
                     if (!TryCreateNewTable(_dataSourceBD))
                     {
-                        logger.Error($"не удалось добавить таблицы в файл {nameFile}");
+                        return false;
                     }
                 }
                 return true;
             }
             catch (Exception ex)
             {
-                logger.Error($"Ошибка чтения файла {nameFile}. Ошибка:{ex}");
+                _logger.LogError(ex, "Ошибка чтения файла {nameFile}.", nameFile);
                 return false;
             }
         }
@@ -64,7 +69,7 @@ namespace test1
             }
             catch (Exception ex)
             {
-                logger.Error($"не удалось в db создать файл или добавить таблицу.Файл {fullNameFile} Ошибка: {ex}");
+                _logger.LogError(ex, "Не удалось в db создать файл или добавить таблицу.Файл {fullNameFile}", fullNameFile);
                 return false;
             }
         }
@@ -73,6 +78,7 @@ namespace test1
         {
             if (!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
             {
+                _logger.LogWarning("Не верные данные пользователя name - {name} phone - {phone}", name, phone);
                 return false;
             }
 
@@ -92,8 +98,7 @@ namespace test1
             }
             catch (SqliteException ex)
             {
-                logger.Error($"не удалось добавить контакты в файл {_dataSourceBD}");
-                Console.WriteLine(ex);
+                _logger.LogError(ex, "не удалось добавить контакты в файл {_dataSourceBD}", _dataSourceBD);
                 return false;
             }
         }
@@ -101,10 +106,9 @@ namespace test1
         public bool TryTakeContacts(int offset, int take, out List<Contact> outContacts)
         {
             outContacts = new();
-
             if (offset < 0 && offset > AmountOfContact())
             {
-                logger.Error($"не верные offset({offset}) и take({take}) в методе TryTakeContacts(.db)");
+                _logger.LogError("не верные offset({offset}) и take({take}) в методе TryTakeContacts(.db)", offset, take);
                 return false;
             }
 
@@ -123,8 +127,8 @@ namespace test1
             }
             catch (SqliteException ex)
             {
-                logger.Error($"ошибка чтения файла {_dataSourceBD} для элементов с " +
-    $"{offset}, {take}-количество элементов. Ошибка: {ex}");
+                _logger.LogError(ex, "ошибка чтения файла {_dataSourceBD} для элементов с " +
+    "{offset}, {take}-количество элементов.", _dataSourceBD, offset, take);
                 return false;
             }
         }
@@ -141,7 +145,7 @@ namespace test1
             }
             catch (SqliteException ex)
             {
-                logger.Error($"ошибка чтения файла {_dataSourceBD} при подсчете количества контактов. Ошибка: {ex}");
+                _logger.LogError(ex, "ошибка чтения файла {_dataSourceBD} при подсчете количества контактов.", _dataSourceBD);
                 return 0;
             }
         }
@@ -149,13 +153,14 @@ namespace test1
         public bool CreateFile(string directory, string nameFile)
         {
             if (TryCreateNewTable(
-                Path.Combine(Directory.GetCurrentDirectory(), directory, $"{nameFile}.db")))
+                Path.Combine(Directory.GetCurrentDirectory(), directory, $"{nameFile}.db")) &&
+                ValidationInputClass.TryValidatinNameFile(nameFile))
             {
                 return true;
             }
             else
             {
-                logger.Warn($"не удалось создать файл {nameFile}db.");
+                _logger.LogWarning("не удалось создать файл {nameFile}db.", nameFile);
                 return false;
             }
         }
