@@ -11,9 +11,9 @@ namespace test1
 
     public class BaseDataContactsCSV : IDataContactInterface
     {
-        private readonly ILogger _logger;
+        private readonly ILogger  _logger;
 
-        private const string formatFile = ".csv";
+        public  string FormatFile { get { return ".csv"; } }
 
         private string _nameFile = string.Empty;
         private int _countLine = 0;
@@ -21,9 +21,10 @@ namespace test1
         private bool _flagTryAmout = false;
         private int _amoutOfContact = 0;
 
-        public BaseDataContactsCSV(ILogger logger)
+        public BaseDataContactsCSV(ILogger  logger)
         {
             _logger = logger;
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
         public bool TryInitializationDB(string nameFile)
@@ -32,7 +33,7 @@ namespace test1
             {
                 if (!File.Exists(nameFile))
                 {
-                    _logger.LogError("При иниацилизации указаный файл не найден(файл - {nameFile})", nameFile);
+                    _logger.LogError("При инициализации указанный файл не найден(файл - {nameFile})", nameFile);
                     return false;
                 }
                 _nameFile = nameFile;
@@ -40,7 +41,7 @@ namespace test1
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка иниацилизации BaseDataContactsCSV");
+                _logger.LogError(ex, "Ошибка инициализации BaseDataContactsCSV");
                 return false;
             }
             return true;
@@ -56,7 +57,8 @@ namespace test1
 
             try
             {
-                File.AppendAllText(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n", Encoding.GetEncoding(1251));
+                File.AppendAllText(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n",
+                    Encoding.GetEncoding(1251));
                 _flagTryAmout = false;
                 return true;
             }
@@ -79,7 +81,6 @@ namespace test1
 
             try
             {
-                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                 using StreamReader fileRead = new(_nameFile, Encoding.GetEncoding(1251));
                 int i = 0;
                 string? readLine = "";
@@ -129,7 +130,7 @@ namespace test1
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "ошибка чтения файла {_nameFile} при подсчете количества контактов." , _nameFile);
+                _logger.LogError(ex, "ошибка чтения файла {_nameFile} при подсчете количества контактов.", _nameFile);
                 return 0;
             }
         }
@@ -139,12 +140,12 @@ namespace test1
             string fullName = Path.Combine(Directory.GetCurrentDirectory(), directory, $"{nameFile}.csv");
 
             if (ValidationInputClass.TryValidatinNameFile(nameFile)
-    && !File.Exists(fullName))
+                 && !File.Exists(fullName))
             {
                 try
                 {
                     File.Create(fullName).Close();
-
+                    _nameFile = fullName;
                     return true;
                 }
                 catch (Exception ex)
@@ -153,14 +154,14 @@ namespace test1
                 }
             }
             _logger.LogWarning("Была неудачная попытка создать файл {nameFile}. " +
-                "Имя файла состоит из запрешенных символов или такой файл уже есть.", nameFile);
+                "Имя файла состоит из запрещённых символов или такой файл уже есть.", nameFile);
             return false;
         }
 
-        public string FormatFile()
-        {
-            return formatFile;
-        }
+        //public string FormatFile()
+        //{
+        //    return formatFile;
+        //}
 
         private static Contact ParsLineInContact(string line)
         {

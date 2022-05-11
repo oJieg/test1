@@ -19,7 +19,7 @@ namespace test1
         private bool _exitFlag = false; //флаг выхода из окна
 
         protected ILogger Logger { get; }
-        public Screen(int numberOfLinesOnRender, ILogger loger)
+        public Screen(int numberOfLinesOnRender, ILogger  loger)
         {
             if(numberOfLinesOnRender == 0)
             {
@@ -37,7 +37,7 @@ namespace test1
             while (!_exitFlag)
             {
                 Update();
-                FullAmoutOfLine();
+                FullAmoutOfLines();
                 Console.Clear();
                 if (PageCounter)
                 {
@@ -67,7 +67,7 @@ namespace test1
         }
 
         //считает сколько страниц всего в наличии
-        protected void FullAmoutOfLine()
+        protected void FullAmoutOfLines()
         {
             float numberPage = (float)FullAmountOfLines / (float)NumberOfLinesOnRender;
             TotalPages = (int)Math.Ceiling(numberPage);
@@ -119,6 +119,7 @@ namespace test1
         protected void KeyInput(out int InputInt, out string InputString)
         {
             ConsoleKeyInfo key = Console.ReadKey();
+            if(key.KeyChar)
 
             InputString = key.Key.ToString();
             if (InputString.Length > 1 && (InputString.Remove(1) == "D" || InputString.Remove(3) == "Num"))

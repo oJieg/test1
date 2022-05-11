@@ -10,16 +10,16 @@ namespace test1
         private readonly string _formatFile;
         private string[] listNameFile;
 
-        private string _nameFile;
+        //private string _nameFile;
         private const string nameDirectory = "DataBase";
         private readonly string fullAdresDirectory;
         private readonly IDataContactInterface _tupeBD;
 
-        public ScreenFileSelection(int numberOfLinesOnRender, IDataContactInterface tupeBD, ILogger logger)
+        public ScreenFileSelection(int numberOfLinesOnRender, IDataContactInterface tupeBD, ILogger  logger)
             : base(numberOfLinesOnRender, logger)
         {
             fullAdresDirectory = Path.Combine(Directory.GetCurrentDirectory(), nameDirectory);
-            _formatFile = tupeBD.FormatFile();
+            _formatFile = tupeBD.FormatFile;
             PageCounter = true;
             _tupeBD = tupeBD;
         }
@@ -74,27 +74,30 @@ namespace test1
 
             if (InputInt > 0 && InputInt <= LengthForTotalNumber)
             {
-                try
-                {
-                    _nameFile = listNameFile[InputInt - 1 + OffsetForTotalNumber];
-                    if (_tupeBD.TryInitializationDB(_nameFile))
-                    {
-                        Logger.LogInformation("Откытие: {_nameFile}", _nameFile);
-
-                        ScreenMainBD screenMainBD = new(NumberOfLinesOnRender, _tupeBD, Logger);
-                        screenMainBD.MainRender();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex, "ошибка при выборе файла из списка");
-                }
-                //ExitScreen();
+                NextSkreen(listNameFile[InputInt - 1 + OffsetForTotalNumber]);
                 return;
             }
         }
 
         //----------------------------------------------------------------------------
+        private void NextSkreen(string nameFile)
+        {
+            try
+            {
+                if (_tupeBD.TryInitializationDB(nameFile))
+                {
+                    Logger.LogInformation("Откытие: {_nameFile}", nameFile);
+
+                    ScreenMainBD screenMainBD = new(NumberOfLinesOnRender, _tupeBD, Logger);
+                    screenMainBD.MainRender();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "ошибка при выборе файла из списка");
+            }
+        }
+
         private void ListNameFile()
         {
             try
@@ -132,6 +135,8 @@ namespace test1
             if (_tupeBD.CreateFile(nameDirectory, nameFile))
             {
                 Logger.LogInformation("был успешно создан файл {nameFile}", nameFile);
+                NextSkreen(Path.Combine(Directory.GetCurrentDirectory(), fullAdresDirectory, $"{nameFile}{_formatFile}"));
+
             }
         }
     }

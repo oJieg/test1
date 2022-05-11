@@ -6,8 +6,8 @@ namespace test1
 {
     public class BaseDataContactsTemporary : IDataContactInterface
     {
-        // private static Logger logger = LogManager.GetCurrentClassLogger();
         private readonly ILogger _logger;
+        public string FormatFile { get { return string.Empty; } }
 
         public BaseDataContactsTemporary(ILogger logger)
         {
@@ -57,16 +57,14 @@ namespace test1
                 {
                     take = amoutOfContact - offset;
                 }
-                foreach (Contact contact in _contacts.GetRange(offset, take))
-                {
-                    outContacts.Add(contact);
-                }
+                outContacts.AddRange(_contacts.GetRange(offset, take));
+
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "ошибка чтения файла  для элементов с " +
-    "{offset}, {take}-количество элементов.", offset, take);
+                        "{offset}, {take}-количество элементов.", offset, take);
                 return false;
             }
         }
@@ -78,10 +76,6 @@ namespace test1
         public bool CreateFile(string directory, string nameFile)
         {
             return true;
-        }
-        public string FormatFile()
-        {
-            return string.Empty;
         }
     }
 }

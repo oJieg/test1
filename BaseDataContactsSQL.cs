@@ -13,7 +13,7 @@ namespace test1
         private readonly ILogger _logger;
 
         private string _dataSourceBD = String.Empty;
-        private const string formatFile = ".db";
+        public string FormatFile { get { return ".db"; } }
 
         public BaseDataContactsSQL(ILogger logger)
         {
@@ -152,9 +152,9 @@ namespace test1
 
         public bool CreateFile(string directory, string nameFile)
         {
-            if (TryCreateNewTable(
-                Path.Combine(Directory.GetCurrentDirectory(), directory, $"{nameFile}.db")) &&
-                ValidationInputClass.TryValidatinNameFile(nameFile))
+            string fullNameFile = Path.Combine(Directory.GetCurrentDirectory(), directory, $"{nameFile}.db");
+
+            if (TryCreateNewTable(fullNameFile) && ValidationInputClass.TryValidatinNameFile(nameFile))
             {
                 return true;
             }
@@ -165,9 +165,9 @@ namespace test1
             }
         }
 
-        public string FormatFile()
-        {
-            return formatFile;
-        }
+        //public string FormatFile()
+        //{
+        //    return formatFile;
+        //}
     }
 }
