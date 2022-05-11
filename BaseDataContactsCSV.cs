@@ -21,9 +21,9 @@ namespace test1
         private bool _flagTryAmout = false;
         private int _amoutOfContact = 0;
 
-        public BaseDataContactsCSV(ILogger  logger)
+        public BaseDataContactsCSV(ILoggerFactory loggerFactory)
         {
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<BaseDataContactsCSV>();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 

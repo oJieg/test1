@@ -15,9 +15,9 @@ namespace test1
         private string _dataSourceBD = String.Empty;
         public string FormatFile { get { return ".db"; } }
 
-        public BaseDataContactsSQL(ILogger logger)
+        public BaseDataContactsSQL(ILoggerFactory loggerFactory)
         {
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<BaseDataContactsSQL>();
         }
 
         public bool TryInitializationDB(string nameFile)

@@ -7,9 +7,10 @@ namespace test1
     public class ScreenSelect : Screen
     {
         private readonly List<string> _data = new();
-        public ScreenSelect(int numberOfLinesOnRender, ILogger logger)
-            : base(numberOfLinesOnRender, logger)
+        public ScreenSelect(int numberOfLinesOnRender, ILoggerFactory loggerFactory)
+            : base(numberOfLinesOnRender, loggerFactory)
         {
+            Logger = LoggerFactory.CreateLogger<ScreenSelect>();
             AddDataForRener();
             FullAmountOfLines = _data.Count;
         }
@@ -31,22 +32,22 @@ namespace test1
             return _data;
         }
 
-        protected override void ChoiceInput(int inputInt, string inputString)
+        protected override void ChoiceInput(int inputInt, ConsoleKey inputKay)
         {
-            base.ChoiceInput(inputInt, inputString);
+            base.ChoiceInput(inputInt, inputKay);
 
             switch (inputInt)
             {
                 case 1:
                     ScreenMainBD screenMainBD = 
-                        new(NumberOfLinesOnRender, new BaseDataContactsTemporary(Logger), Logger);
+                        new(NumberOfLinesOnRender, new BaseDataContactsTemporary(LoggerFactory), LoggerFactory);
                     screenMainBD.MainRender();
                     break;
                 case 2:
-                    CallScreenFileSelection(new BaseDataContactsSQL(Logger));
+                    CallScreenFileSelection(new BaseDataContactsSQL(LoggerFactory));
                     break;
                 case 3:
-                    CallScreenFileSelection(new BaseDataContactsCSV(Logger));
+                    CallScreenFileSelection(new BaseDataContactsCSV(LoggerFactory));
                     break;
                 default:
                     break;
@@ -55,7 +56,7 @@ namespace test1
 
         private void CallScreenFileSelection(IDataContactInterface inInterfase)
         {
-            ScreenFileSelection fileSelector = new(NumberOfLinesOnRender, inInterfase, Logger);
+            ScreenFileSelection fileSelector = new(NumberOfLinesOnRender, inInterfase, LoggerFactory);
             fileSelector.MainRender();
         }
     }

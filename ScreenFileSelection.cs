@@ -12,13 +12,14 @@ namespace test1
 
         //private string _nameFile;
         private const string nameDirectory = "DataBase";
-        private readonly string fullAdresDirectory;
+        private readonly string fullAddressDirectory;
         private readonly IDataContactInterface _tupeBD;
 
-        public ScreenFileSelection(int numberOfLinesOnRender, IDataContactInterface tupeBD, ILogger  logger)
-            : base(numberOfLinesOnRender, logger)
+        public ScreenFileSelection(int numberOfLinesOnRender, IDataContactInterface tupeBD, ILoggerFactory loggerFactory)
+            : base(numberOfLinesOnRender, loggerFactory)
         {
-            fullAdresDirectory = Path.Combine(Directory.GetCurrentDirectory(), nameDirectory);
+            Logger = loggerFactory.CreateLogger<ScreenFileSelection>();
+            fullAddressDirectory = Path.Combine(Directory.GetCurrentDirectory(), nameDirectory);
             _formatFile = tupeBD.FormatFile;
             PageCounter = true;
             _tupeBD = tupeBD;
@@ -39,6 +40,13 @@ namespace test1
             }
             List<string> data = new(takeAndOffset);
 
+            if (takeAndOffset > listNameFile.Length)
+            {
+                Logger.LogCritical("Произошла попытка обрашение к не сушествующему элементу массива listNameFile.");
+                data.Add("error");
+                return data;
+            }
+
             try
             {
                 for (int i = OffsetForTotalNumber; i < takeAndOffset; i++)
@@ -46,13 +54,10 @@ namespace test1
                     data.Add(Path.GetFileName(listNameFile[i]));
                 }
             }
-            catch (IndexOutOfRangeException ex)
-            {
-                Logger.LogCritical(ex, "Произошло обрашение к не сушествующему элементу массива listNameFile.");
-            }
+
             catch (Exception ex)
             {
-                Logger.LogCritical(ex, "ошибка получения списка для рендера его.");
+                Logger.LogCritical(ex, "Не получилось создать  список имен файлов для рендеренга.");
             }
             return data;
         }
@@ -63,10 +68,10 @@ namespace test1
             base.ChoiseMenuRender();
         }
 
-        protected override void ChoiceInput(int InputInt, string InputString)
+        protected override void ChoiceInput(int InputInt, ConsoleKey InputKay)
         {
-            base.ChoiceInput(InputInt, InputString);
-            if (InputString == "n" || InputString == "N")
+            base.ChoiceInput(InputInt, InputKay);
+            if (InputKay == ConsoleKey.N)
             {
                 CreateFile();
                 return;
@@ -88,7 +93,7 @@ namespace test1
                 {
                     Logger.LogInformation("Откытие: {_nameFile}", nameFile);
 
-                    ScreenMainBD screenMainBD = new(NumberOfLinesOnRender, _tupeBD, Logger);
+                    ScreenMainBD screenMainBD = new(NumberOfLinesOnRender, _tupeBD, LoggerFactory);
                     screenMainBD.MainRender();
                 }
             }
@@ -102,18 +107,18 @@ namespace test1
         {
             try
             {
-                if (!Directory.Exists(fullAdresDirectory))
+                if (!Directory.Exists(fullAddressDirectory))
                 {
-                    Directory.CreateDirectory(fullAdresDirectory);
-                    Logger.LogInformation("директория {fullAdresDirectory} создана", fullAdresDirectory);
+                    Directory.CreateDirectory(fullAddressDirectory);
+                    Logger.LogInformation("директория {fullAdresDirectory} создана", fullAddressDirectory);
                 }
-                listNameFile = Directory.GetFiles(fullAdresDirectory, $"*{_formatFile}");
+                listNameFile = Directory.GetFiles(fullAddressDirectory, $"*{_formatFile}");
                 FullAmountOfLines = listNameFile.Length;
             }
             catch (IOException ex)
             {
                 Logger.LogError(ex, "Каталог, заданный {fullAdresDirectory}, является файлом. " +
-                    "Или  Имя сети неизвестно.", fullAdresDirectory);
+                    "Или  Имя сети неизвестно.", fullAddressDirectory);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -129,13 +134,13 @@ namespace test1
         {
             Console.Clear();
             Console.WriteLine("введите имя файла: ");
-            string nameFile = string.Empty;
-            nameFile += Console.ReadLine();
+
+            string nameFile = Console.ReadLine();
 
             if (_tupeBD.CreateFile(nameDirectory, nameFile))
             {
                 Logger.LogInformation("был успешно создан файл {nameFile}", nameFile);
-                NextSkreen(Path.Combine(Directory.GetCurrentDirectory(), fullAdresDirectory, $"{nameFile}{_formatFile}"));
+                NextSkreen(Path.Combine(Directory.GetCurrentDirectory(), fullAddressDirectory, $"{nameFile}{_formatFile}"));
 
             }
         }

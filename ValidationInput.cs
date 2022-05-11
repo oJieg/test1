@@ -1,5 +1,4 @@
-﻿
-using System.IO;
+﻿using System.IO;
 using System.Text.RegularExpressions;
 
 namespace test1
@@ -8,7 +7,7 @@ namespace test1
     {
         public static bool TryValidatinNameFile(string? nameFile)
         {
-            if (nameFile == string.Empty || nameFile == null)
+            if (string.IsNullOrWhiteSpace(nameFile))
             {
                 return false;
             }
@@ -33,6 +32,11 @@ namespace test1
                 correctInput = !_validationSeparatorChar.Match(inputPhone).Success;
             }
             return correctInput;
+        }
+
+        public int TestAdd(int a, int b)
+        {
+            return a + b;
         }
     }
 }

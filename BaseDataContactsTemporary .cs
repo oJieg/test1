@@ -9,9 +9,9 @@ namespace test1
         private readonly ILogger _logger;
         public string FormatFile { get { return string.Empty; } }
 
-        public BaseDataContactsTemporary(ILogger logger)
+        public BaseDataContactsTemporary(ILoggerFactory loggerFactory)
         {
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<BaseDataContactsTemporary>();
         }
 
         private readonly List<Contact> _contacts = new();

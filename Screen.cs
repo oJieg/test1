@@ -18,18 +18,22 @@ namespace test1
         protected bool PageCounter { get; set; } // выводить ли на экран отображение страницы текушей(1/5)
         private bool _exitFlag = false; //флаг выхода из окна
 
-        protected ILogger Logger { get; }
-        public Screen(int numberOfLinesOnRender, ILogger  loger)
+        protected ILogger Logger { get; set; }
+        protected ILoggerFactory LoggerFactory { get; }
+        public Screen(int numberOfLinesOnRender, ILoggerFactory loggerFactory)
         {
-            if(numberOfLinesOnRender == 0)
+            LoggerFactory = loggerFactory;
+            if (numberOfLinesOnRender == 0)
             {
-                loger.LogCritical("Конструктор Screen не может принимать numberOfLinesOnRender = 0"); 
+                Logger = LoggerFactory.CreateLogger<Screen>();
+                Logger.LogCritical("Конструктор Screen не может принимать numberOfLinesOnRender = 0"); 
                 throw new ArgumentException("numberOfLinesOnRender не может быть нулем");
             }
             this.NumberOfLinesOnRender = numberOfLinesOnRender;
             CurrentPageNumber = 1;
-            Logger = loger;
         }
+
+
 
         //главный метод который нужно вызывать
         public void MainRender()
@@ -55,8 +59,8 @@ namespace test1
                 PageRender(DataForPageRender());
                 ChoiseMenuRender();
 
-                KeyInput(out int InputInt, out string InputString);
-                ChoiceInput(InputInt, InputString);
+                KeyInput(out int InputInt, out ConsoleKey InputKay);
+                ChoiceInput(InputInt, InputKay);
             }
         }
 
@@ -116,12 +120,12 @@ namespace test1
             }
         }
 
-        protected void KeyInput(out int InputInt, out string InputString)
+        protected void KeyInput(out int InputInt, out ConsoleKey inputKay)
         {
             ConsoleKeyInfo key = Console.ReadKey();
-            if(key.KeyChar)
 
-            InputString = key.Key.ToString();
+            inputKay = key.Key;
+            string InputString = inputKay.ToString();
             if (InputString.Length > 1 && (InputString.Remove(1) == "D" || InputString.Remove(3) == "Num"))
             {
                 try
@@ -157,19 +161,19 @@ namespace test1
         }
 
         //обработка выбора
-        protected virtual void ChoiceInput(int inputInt, string inputString)
+        protected virtual void ChoiceInput(int inputInt, ConsoleKey inputKay)
         {
-            if (inputString == "RightArrow")
+            if (inputKay == ConsoleKey.RightArrow)
             {
                 NextPage();
                 return;
             }
-            if (inputString == "LeftArrow")
+            if (inputKay == ConsoleKey.LeftArrow)
             {
                 PreviousPage();
                 return;
             }
-            if (inputInt == 0 || inputString == "Escape")
+            if (inputInt == 0 || inputKay == ConsoleKey.Escape)
             {
                 ExitScreen();
                 return;

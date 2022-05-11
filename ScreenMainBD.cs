@@ -7,9 +7,10 @@ namespace test1
     internal class ScreenMainBD : Screen
     {
         private readonly IDataContactInterface _dataContacts;
-        public ScreenMainBD(int numberOfLinesOnRender, IDataContactInterface dataContacts, ILogger logger)
-            : base(numberOfLinesOnRender, logger)
+        public ScreenMainBD(int numberOfLinesOnRender, IDataContactInterface dataContacts, ILoggerFactory loggerFactory)
+            : base(numberOfLinesOnRender, loggerFactory)
         {
+            Logger = loggerFactory.CreateLogger<ScreenMainBD>();
             _dataContacts = dataContacts;
             PageCounter = true;
         }
@@ -46,17 +47,17 @@ namespace test1
             Console.WriteLine("N - добавить новый контакт, Т- тестовые контакты");
         }
 
-        protected override void ChoiceInput(int InputInt, string InputString)
+        protected override void ChoiceInput(int InputInt, ConsoleKey InputKay)
         {
-            base.ChoiceInput(InputInt, InputString);
-            if (InputString == "t" || InputString == "T")
+            base.ChoiceInput(InputInt, InputKay);
+            if (InputKay == ConsoleKey.T)
             {
                 for (int i = 0; i < 5; i++)
                 {
                     _dataContacts.TryAddContact($"name{i}", $"phone{i}");
                 }
             }
-            if (InputString == "n" || InputString == "N")
+            if (InputKay == ConsoleKey.N)
             {
                 AddContact();
             }
@@ -82,7 +83,7 @@ namespace test1
                 if (!_dataContacts.TryAddContact(name, phone))
                 {
                     Logger.LogError("Не удалось добавить контакт, " +
-        "в имени или телефоне есть запрешенные символы name - {name}, phone - {phone}", name, phone);
+        "в имени или телефоне есть запрещенные символы name - {name}, phone - {phone}", name, phone);
                     MessageForNotValidInput("Не удалось добавить контакт." +
                         "В имени или телефоне присудствуют запрешенные символ - ;");
                 }
