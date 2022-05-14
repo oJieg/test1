@@ -39,7 +39,7 @@ namespace test1
             switch (inputInt)
             {
                 case 1:
-                    ScreenMainBD screenMainBD = 
+                    ScreenMainBD screenMainBD =
                         new(NumberOfLinesOnRender, new BaseDataContactsTemporary(LoggerFactory), LoggerFactory);
                     screenMainBD.MainRender();
                     break;

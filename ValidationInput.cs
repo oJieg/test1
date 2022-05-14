@@ -11,7 +11,7 @@ namespace test1
             {
                 return false;
             }
-
+            nameFile = Path.GetFileName(nameFile);
             string forbiddenSymbols = new(Path.GetInvalidFileNameChars());
             Regex r = new(string.Format("[{0}]", Regex.Escape(forbiddenSymbols)));
             if (!r.Match(nameFile).Success)

@@ -11,9 +11,9 @@ namespace test1
 
     public class BaseDataContactsCSV : IDataContactInterface
     {
-        private readonly ILogger  _logger;
+        private readonly ILogger _logger;
 
-        public  string FormatFile { get { return ".csv"; } }
+        public string FormatFile { get { return ".csv"; } }
 
         private string _nameFile = string.Empty;
         private int _countLine = 0;
@@ -21,6 +21,7 @@ namespace test1
         private bool _flagTryAmout = false;
         private int _amoutOfContact = 0;
 
+        private bool _needCreateFile = false;
         public BaseDataContactsCSV(ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger<BaseDataContactsCSV>();
@@ -29,14 +30,14 @@ namespace test1
 
         public bool TryInitializationDB(string nameFile)
         {
+            _nameFile = nameFile;
             try
             {
                 if (!File.Exists(nameFile))
                 {
-                    _logger.LogError("При инициализации указанный файл не найден(файл - {nameFile})", nameFile);
-                    return false;
+                    _needCreateFile = true;
+                    return true;
                 }
-                _nameFile = nameFile;
                 _countLine = AmountOfContact();
             }
             catch (Exception ex)
@@ -54,6 +55,11 @@ namespace test1
                 _logger.LogWarning("Не верные данные пользователя name - {name} phone - {phone}", name, phone);
                 return false;
             }
+            if (_needCreateFile && !TryCreateFile(_nameFile))
+            {
+                return false;
+            }
+            _needCreateFile = false;
 
             try
             {
@@ -73,9 +79,13 @@ namespace test1
         public bool TryTakeContacts(int offset, int take, out List<Contact> outContacts)
         {
             outContacts = new();
-            if (offset < 0 && offset > AmountOfContact())
+            if (_needCreateFile)
             {
-                _logger.LogError("не верные offset({offset}) и take({take}) в методе TryTakeContacts(.csv)", offset, take);
+                return true;
+            }
+            if (!HelperBaseData.ValidationOffset(offset, AmountOfContact()))
+            {
+                _logger.LogError("не верные offset({offset})", offset);
                 return false;
             }
 
@@ -111,6 +121,10 @@ namespace test1
 
         public int AmountOfContact()
         {
+            if (_needCreateFile)
+            {
+                return 0;
+            }
             if (_flagTryAmout)
             {
                 return _amoutOfContact;
@@ -135,17 +149,15 @@ namespace test1
             }
         }
 
-        public bool CreateFile(string directory, string nameFile)
+        public bool TryCreateFile(string nameFile)
         {
-            string fullName = Path.Combine(Directory.GetCurrentDirectory(), directory, $"{nameFile}.csv");
-
             if (ValidationInputClass.TryValidatinNameFile(nameFile)
-                 && !File.Exists(fullName))
+                 && !File.Exists(nameFile))
             {
                 try
                 {
-                    File.Create(fullName).Close();
-                    _nameFile = fullName;
+                    File.Create(nameFile).Close();
+                    TryInitializationDB(nameFile);
                     return true;
                 }
                 catch (Exception ex)
@@ -153,15 +165,11 @@ namespace test1
                     _logger.LogWarning(ex, "не удалось создать файл {nameFile} csv.", nameFile);
                 }
             }
+
             _logger.LogWarning("Была неудачная попытка создать файл {nameFile}. " +
                 "Имя файла состоит из запрещённых символов или такой файл уже есть.", nameFile);
             return false;
         }
-
-        //public string FormatFile()
-        //{
-        //    return formatFile;
-        //}
 
         private static Contact ParsLineInContact(string line)
         {

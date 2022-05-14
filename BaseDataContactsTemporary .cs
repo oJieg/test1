@@ -45,9 +45,9 @@ namespace test1
         {
             outContacts = new();
             int amoutOfContact = AmountOfContact();
-            if (offset < 0 || offset > amoutOfContact)
+            if (HelperBaseData.ValidationOffset(offset, amoutOfContact))
             {
-                _logger.LogError("не верные offset({offset}) и take({take}) в методе TryTakeContacts(в памяти)", offset, take);
+                _logger.LogError("не верные offset({offset})", offset);
                 return false;
             }
 
@@ -73,7 +73,7 @@ namespace test1
         {
             return _contacts.Count;
         }
-        public bool CreateFile(string directory, string nameFile)
+        public bool TryCreateFile(string nameFile)
         {
             return true;
         }

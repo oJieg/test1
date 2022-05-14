@@ -13,6 +13,8 @@ namespace test1
         private readonly ILogger _logger;
 
         private string _dataSourceBD = String.Empty;
+        private bool _needCreatFile = false;
+        private string _nameFile;
         public string FormatFile { get { return ".db"; } }
 
         public BaseDataContactsSQL(ILoggerFactory loggerFactory)
@@ -22,10 +24,11 @@ namespace test1
 
         public bool TryInitializationDB(string nameFile)
         {
+            _nameFile = nameFile;
             if (!File.Exists(nameFile))
             {
-                _logger.LogError("При иниацилизации указаный файл не найден(файл -{nameFile})", nameFile);
-                return false;
+                _needCreatFile = true;
+                return true;
             }
             _dataSourceBD = $"Data Source={nameFile}";
             try
@@ -81,6 +84,11 @@ namespace test1
                 _logger.LogWarning("Не верные данные пользователя name - {name} phone - {phone}", name, phone);
                 return false;
             }
+            if (_needCreatFile && !TryCreateFile(_nameFile))
+            {
+                return false;
+            }
+            _needCreatFile = false;
 
             try
             {
@@ -106,9 +114,14 @@ namespace test1
         public bool TryTakeContacts(int offset, int take, out List<Contact> outContacts)
         {
             outContacts = new();
-            if (offset < 0 && offset > AmountOfContact())
+            if (_needCreatFile)
             {
-                _logger.LogError("не верные offset({offset}) и take({take}) в методе TryTakeContacts(.db)", offset, take);
+                return true;
+            }
+
+            if (!HelperBaseData.ValidationOffset(offset, AmountOfContact()))
+            {
+                _logger.LogError("не верные offset({offset})", offset);
                 return false;
             }
 
@@ -135,6 +148,11 @@ namespace test1
 
         public int AmountOfContact()
         {
+            if (_needCreatFile)
+            {
+                return 0;
+            }
+
             try
             {
                 using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadOnly");
@@ -150,12 +168,13 @@ namespace test1
             }
         }
 
-        public bool CreateFile(string directory, string nameFile)
+        public bool TryCreateFile(string nameFile)
         {
-            string fullNameFile = Path.Combine(Directory.GetCurrentDirectory(), directory, $"{nameFile}.db");
-
-            if (TryCreateNewTable(fullNameFile) && ValidationInputClass.TryValidatinNameFile(nameFile))
+            if (ValidationInputClass.TryValidatinNameFile(nameFile) &&
+                !File.Exists(nameFile) &&
+                TryCreateNewTable(nameFile))
             {
+                TryInitializationDB(nameFile);
                 return true;
             }
             else
@@ -164,10 +183,5 @@ namespace test1
                 return false;
             }
         }
-
-        //public string FormatFile()
-        //{
-        //    return formatFile;
-        //}
     }
 }

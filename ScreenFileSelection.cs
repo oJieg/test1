@@ -136,12 +136,15 @@ namespace test1
             Console.WriteLine("введите имя файла: ");
 
             string nameFile = Console.ReadLine();
-
-            if (_tupeBD.CreateFile(nameDirectory, nameFile))
+            nameFile += _formatFile;
+            string fullNameFile = Path.Combine(fullAddressDirectory, nameFile);
+            if (File.Exists(fullNameFile))
             {
-                Logger.LogInformation("был успешно создан файл {nameFile}", nameFile);
-                NextSkreen(Path.Combine(Directory.GetCurrentDirectory(), fullAddressDirectory, $"{nameFile}{_formatFile}"));
-
+                MessageForNotValidInput("Такой файл уже сушествует.");
+            }
+            else
+            {
+                NextSkreen(fullNameFile);
             }
         }
     }
