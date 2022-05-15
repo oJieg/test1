@@ -1,22 +1,30 @@
-﻿namespace test1
+﻿using System.Collections.Generic;
+using System;
+using System.IO;
+using Microsoft.Extensions.Logging;
+
+namespace test1
 {
     public class Program
     {
         static void Main(string[] args)
         {
-            BaseDataContacts newBook = new("test1");
-            newBook.InitializationBD();
-            RenderContact render = new(newBook, 4);
-            MenuInput input = new(render, newBook);
+            ILoggerFactory loggerFactory = new NLog.Extensions.Logging.NLogLoggerFactory();
+           // ILogger logger = loggerFactory.CreateLogger<Program>();
 
-            int page = 1; //какую страницу рендерить дальше
-            do
-            {
-                render.RenderPage(page);
-                page = input.MainInput();
-            }
-            while (page != 0);
+            int numberOfLinesOnRender = 4;
+            Screen screenChoise = new ScreenSelect(numberOfLinesOnRender, loggerFactory);
+            screenChoise.MainRender();
         }
-
     }
 }
+
+//int a = 1;
+//int b = 2;
+
+//int ExpectedResult = 3;
+
+//ValidationInputClass s = new ValidationInputClass();
+//int outResultat = s.TestAdd(a, b);
+
+//Assert.Equal(ExpectedResult, outResultat);
