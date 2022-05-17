@@ -18,13 +18,3 @@ namespace test1
         }
     }
 }
-
-//int a = 1;
-//int b = 2;
-
-//int ExpectedResult = 3;
-
-//ValidationInputClass s = new ValidationInputClass();
-//int outResultat = s.TestAdd(a, b);
-
-//Assert.Equal(ExpectedResult, outResultat);
