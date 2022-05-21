@@ -45,7 +45,7 @@ namespace test1
             {
                 dataForPageRender = await waitingLoading.RunAsyncWaitingLoading(AsyncCallBD);
 
-                Console.Clear();
+              //  Console.Clear();
                 if (PageCounter)
                 {
                     if (TotalPages == 0)
@@ -69,7 +69,7 @@ namespace test1
 
         private async Task<List<string>> AsyncCallBD()
         {
-           // await Task.Delay(2000);
+            //await Task.Delay(2000);
             Update();
             FullAmoutOfLines();
 

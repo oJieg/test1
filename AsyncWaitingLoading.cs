@@ -18,23 +18,32 @@ namespace test1
         }
         public async Task<List<string>> RunAsyncWaitingLoading(AsyncCallBD asyncCallBD)
         {
-            Console.Clear();
+            clear();
+            Console.Write(outText);
             List<string> result = new();
             Task<List<string>> resultTask = asyncCallBD();
-
-            do
+            //await Task.Delay(100);
+            while (resultTask.Status != TaskStatus.RanToCompletion) 
             {
                 await Task.Delay(100);
                 WaitingLoadingRender();
             }
-            while (resultTask.Status != TaskStatus.RanToCompletion);
 
             result = await resultTask;
-            Console.Clear();
+            clear();
             return result;
 
         }
 
+        private void clear()
+        {
+            Console.SetCursorPosition(0, 0);
+            Console.CursorVisible = false;
+            for (int y = 0; y < Console.WindowHeight; y++)
+                Console.Write(new String(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, 0);
+            Console.CursorVisible = true;
+        }
         public void WaitingLoadingRender()
         {
 
