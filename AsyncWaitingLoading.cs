@@ -12,17 +12,14 @@ namespace test1
     {
         private int _condition = 0;
         private static string outText = "загрузка ";
-        public AsyncWaitingLoading()
-        {
-            //  Console.Write(outText);
-        }
+
         public async Task<List<string>> RunAsyncWaitingLoading(AsyncCallBD asyncCallBD)
         {
             clear();
             Console.Write(outText);
             List<string> result = new();
             Task<List<string>> resultTask = asyncCallBD();
-            //await Task.Delay(100);
+
             while (resultTask.Status != TaskStatus.RanToCompletion) 
             {
                 await Task.Delay(100);
@@ -32,7 +29,6 @@ namespace test1
             result = await resultTask;
             clear();
             return result;
-
         }
 
         private void clear()
@@ -46,7 +42,6 @@ namespace test1
         }
         public void WaitingLoadingRender()
         {
-
             switch (_condition)
             {
                 case 0:
@@ -54,7 +49,7 @@ namespace test1
                     _condition = 1;
                     break;
                 case 1:
-                    Console.Write("\b" + @"|");
+                    Console.Write("\b" + "|");
                     _condition = 2;
                     break;
                 case 2:
@@ -67,6 +62,5 @@ namespace test1
                     break;
             }
         }
-
     }
 }

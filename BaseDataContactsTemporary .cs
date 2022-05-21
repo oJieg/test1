@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace test1
 {
@@ -20,7 +21,7 @@ namespace test1
             return true;
         }
 
-        public bool TryAddContact(string name, string? phone)
+        public async Task<bool> TryAddContact(string name, string? phone)
         {
             if (!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
             {

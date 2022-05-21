@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace test1
 {
@@ -7,7 +8,7 @@ namespace test1
         string FormatFile { get; }
 
         bool TryInitializationDB(string nameFile);
-        bool TryAddContact(string name, string? phone);
+        Task<bool> TryAddContact(string name, string? phone);
         bool TryTakeContacts(int offset, int take, out List<Contact> outContacts);
         int AmountOfContact();
         bool TryCreateFile(string nameFile);

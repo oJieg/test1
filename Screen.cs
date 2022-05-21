@@ -76,7 +76,7 @@ namespace test1
             return DataForPageRender();
         }
 
-        //рендер тукушей стоницы (1/5)
+        //рендер тукушей страницы (1/5)
         protected void PageCounterRender()
         {
             Console.WriteLine($"{CurrentPageNumber}/{TotalPages}");

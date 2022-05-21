@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace test1
 {
@@ -77,7 +78,7 @@ namespace test1
             }
         }
 
-        public bool TryAddContact(string name, string? phone)
+        public async Task<bool> TryAddContact(string name, string? phone)
         {
             if (!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
             {

@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 
 namespace test1
@@ -48,7 +49,7 @@ namespace test1
             return true;
         }
 
-        public bool TryAddContact(string name, string? phone)
+        public async Task<bool> TryAddContact(string name, string? phone)
         {
             if (!ValidationInputClass.TryValidationForbiddenInputContact(name, phone))
             {
@@ -63,7 +64,7 @@ namespace test1
 
             try
             {
-                File.AppendAllText(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n",
+               await File.AppendAllTextAsync(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n",
                     Encoding.GetEncoding(1251));
                 _flagTryAmout = false;
                 return true;

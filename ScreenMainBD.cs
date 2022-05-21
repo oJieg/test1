@@ -53,10 +53,13 @@ namespace test1
             base.ChoiceInput(InputInt, InputKay);
             if (InputKay == ConsoleKey.T)
             {
-                for (int i = 0; i < 5; i++)
+                List<Task<bool>> checkListAdd = new();
+                for (int i = 0; i < 500; i++)
                 {
-                    _dataContacts.TryAddContact($"name{i}", $"phone{i}");
+                    checkListAdd.Add(_dataContacts.TryAddContact($"name{i}", $"phone{i}"));
                 }
+                await Task.WhenAll(checkListAdd);
+
             }
             if (InputKay == ConsoleKey.N)
             {
@@ -81,10 +84,10 @@ namespace test1
                 Console.WriteLine("ввидите телефон");
                 string? phone = Console.ReadLine();
 
-                if (!_dataContacts.TryAddContact(name, phone))
+                if (!_dataContacts.TryAddContact(name, phone).Result)
                 {
                     Logger.LogError("Не удалось добавить контакт, " +
-        "в имени или телефоне есть запрещенные символы name - {name}, phone - {phone}", name, phone);
+                     "в имени или телефоне есть запрещенные символы name - {name}, phone - {phone}", name, phone);
                     MessageForNotValidInput("Не удалось добавить контакт." +
                         "В имени или телефоне присудствуют запрешенные символ - ;");
                 }
