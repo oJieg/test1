@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace test1
 {
@@ -68,7 +69,7 @@ namespace test1
             base.ChoiseMenuRender();
         }
 
-        protected override void ChoiceInput(int InputInt, ConsoleKey InputKay)
+        protected override async Task ChoiceInput(int InputInt, ConsoleKey InputKay)
         {
             base.ChoiceInput(InputInt, InputKay);
             if (InputKay == ConsoleKey.N)
@@ -79,13 +80,13 @@ namespace test1
 
             if (InputInt > 0 && InputInt <= LengthForTotalNumber)
             {
-                NextSkreen(listNameFile[InputInt - 1 + OffsetForTotalNumber]);
+                await NextSkreen(listNameFile[InputInt - 1 + OffsetForTotalNumber]);
                 return;
             }
         }
 
         //----------------------------------------------------------------------------
-        private void NextSkreen(string nameFile)
+        private async Task NextSkreen(string nameFile)
         {
             try
             {
@@ -94,7 +95,7 @@ namespace test1
                     Logger.LogInformation("Откытие: {_nameFile}", nameFile);
 
                     ScreenMainBD screenMainBD = new(NumberOfLinesOnRender, _tupeBD, LoggerFactory);
-                    screenMainBD.MainRender();
+                    await screenMainBD.MainRender();
                 }
             }
             catch (Exception ex)
@@ -130,7 +131,7 @@ namespace test1
             }
         }
 
-        private void CreateFile()
+        private async Task CreateFile()
         {
             Console.Clear();
             Console.WriteLine("введите имя файла: ");
@@ -144,7 +145,7 @@ namespace test1
             }
             else
             {
-                NextSkreen(fullNameFile);
+                await NextSkreen(fullNameFile);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace test1
 {
@@ -32,7 +33,7 @@ namespace test1
             return _data;
         }
 
-        protected override void ChoiceInput(int inputInt, ConsoleKey inputKay)
+        protected override async Task ChoiceInput(int inputInt, ConsoleKey inputKay)
         {
             base.ChoiceInput(inputInt, inputKay);
 
@@ -41,23 +42,23 @@ namespace test1
                 case 1:
                     ScreenMainBD screenMainBD =
                         new(NumberOfLinesOnRender, new BaseDataContactsTemporary(LoggerFactory), LoggerFactory);
-                    screenMainBD.MainRender();
+                    await screenMainBD.MainRender();
                     break;
                 case 2:
-                    CallScreenFileSelection(new BaseDataContactsSQL(LoggerFactory));
+                    await CallScreenFileSelection(new BaseDataContactsSQL(LoggerFactory));
                     break;
                 case 3:
-                    CallScreenFileSelection(new BaseDataContactsCSV(LoggerFactory));
+                    await CallScreenFileSelection(new BaseDataContactsCSV(LoggerFactory));
                     break;
                 default:
                     break;
             }
         }
 
-        private void CallScreenFileSelection(IDataContactInterface inInterfase)
+        private async Task CallScreenFileSelection(IDataContactInterface inInterfase)
         {
             ScreenFileSelection fileSelector = new(NumberOfLinesOnRender, inInterfase, LoggerFactory);
-            fileSelector.MainRender();
+            await fileSelector.MainRender();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace test1
         public async Task MainMetod() 
         {
             Task timeRandom = PrintAsync("redi");
-            WaitingLoading waitingLoading = new();
+            AsyncWaitingLoading waitingLoading = new();
 
             do
             {

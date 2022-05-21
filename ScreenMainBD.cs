@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace test1
 {
@@ -47,7 +48,7 @@ namespace test1
             Console.WriteLine("N - добавить новый контакт, Т- тестовые контакты");
         }
 
-        protected override void ChoiceInput(int InputInt, ConsoleKey InputKay)
+        protected override async Task ChoiceInput(int InputInt, ConsoleKey InputKay)
         {
             base.ChoiceInput(InputInt, InputKay);
             if (InputKay == ConsoleKey.T)
@@ -92,6 +93,6 @@ namespace test1
             {
                 Logger.LogError(ex, "ошибка интерфейса добавления контакта");
             }
-    }
+        }
     }
 }

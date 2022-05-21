@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace test1
 {
@@ -26,7 +27,7 @@ namespace test1
             if (numberOfLinesOnRender == 0)
             {
                 Logger = LoggerFactory.CreateLogger<Screen>();
-                Logger.LogCritical("Конструктор Screen не может принимать numberOfLinesOnRender = 0"); 
+                Logger.LogCritical("Конструктор Screen не может принимать numberOfLinesOnRender = 0");
                 throw new ArgumentException("numberOfLinesOnRender не может быть нулем");
             }
             this.NumberOfLinesOnRender = numberOfLinesOnRender;
@@ -36,12 +37,14 @@ namespace test1
 
 
         //главный метод который нужно вызывать
-        public void MainRender()
+        public async Task MainRender()
         {
+            List<string> dataForPageRender = new();
+            AsyncWaitingLoading waitingLoading = new();
             while (!_exitFlag)
             {
-                Update();
-                FullAmoutOfLines();
+                dataForPageRender = await waitingLoading.RunAsyncWaitingLoading(AsyncCallBD);
+
                 Console.Clear();
                 if (PageCounter)
                 {
@@ -56,12 +59,21 @@ namespace test1
 
                 }
                 Title();
-                PageRender(DataForPageRender());
+                PageRender(dataForPageRender);
                 ChoiseMenuRender();
 
                 KeyInput(out int InputInt, out ConsoleKey InputKay);
-                ChoiceInput(InputInt, InputKay);
+                await ChoiceInput(InputInt, InputKay);
             }
+        }
+
+        private async Task<List<string>> AsyncCallBD()
+        {
+           // await Task.Delay(2000);
+            Update();
+            FullAmoutOfLines();
+
+            return DataForPageRender();
         }
 
         //рендер тукушей стоницы (1/5)
@@ -161,7 +173,7 @@ namespace test1
         }
 
         //обработка выбора
-        protected virtual void ChoiceInput(int inputInt, ConsoleKey inputKay)
+        protected virtual async Task ChoiceInput(int inputInt, ConsoleKey inputKay)
         {
             if (inputKay == ConsoleKey.RightArrow)
             {
