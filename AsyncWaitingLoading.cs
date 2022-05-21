@@ -59,6 +59,10 @@ namespace test1
                     break;
                 case 2:
                     Console.Write("\b" + "/");
+                    _condition = 3;
+                    break;
+                case 3:
+                    Console.Write("\b" + "|");
                     _condition = 0;
                     break;
             }
