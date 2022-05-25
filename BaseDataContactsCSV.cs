@@ -35,6 +35,12 @@ namespace test1
             {
                 if (!File.Exists(nameFile))
                 {
+                    if(!ValidationInputClass.TryValidatinNameFile(nameFile))
+                    {
+                        _logger.LogWarning("Была неудачная попытка создать файл {nameFile}. " +
+                                           "Имя файла состоит из запрещённых символов.", nameFile);
+                        return false;
+                    }
                     _needCreateFile = true;
                     return true;
                 }
@@ -55,17 +61,16 @@ namespace test1
                 _logger.LogWarning("Не верные данные пользователя name - {name} phone - {phone}", name, phone);
                 return false;
             }
-            if (_needCreateFile && !TryCreateFile(_nameFile))
-            {
-                return false;
-            }
-            _needCreateFile = false;
-
+            
             try
             {
                 File.AppendAllText(_nameFile, $"\"{AddEscapeChar(name)}\";\"{AddEscapeChar(phone)}\"\n",
                     Encoding.GetEncoding(1251));
                 _flagTryAmout = false;
+                if(_needCreateFile)
+                {
+                    _needCreateFile = false;
+                }
                 return true;
             }
             catch (Exception ex)
@@ -147,28 +152,6 @@ namespace test1
                 _logger.LogError(ex, "ошибка чтения файла {_nameFile} при подсчете количества контактов.", _nameFile);
                 return 0;
             }
-        }
-
-        public bool TryCreateFile(string nameFile)
-        {
-            if (ValidationInputClass.TryValidatinNameFile(nameFile)
-                 && !File.Exists(nameFile))
-            {
-                try
-                {
-                    File.Create(nameFile).Close();
-                    TryInitializationDB(nameFile);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "не удалось создать файл {nameFile} csv.", nameFile);
-                }
-            }
-
-            _logger.LogWarning("Была неудачная попытка создать файл {nameFile}. " +
-                "Имя файла состоит из запрещённых символов или такой файл уже есть.", nameFile);
-            return false;
         }
 
         private static Contact ParsLineInContact(string line)

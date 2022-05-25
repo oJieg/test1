@@ -25,12 +25,13 @@ namespace test1
         public bool TryInitializationDB(string nameFile)
         {
             _nameFile = nameFile;
+            _dataSourceBD = $"Data Source={nameFile}";
             if (!File.Exists(nameFile))
             {
                 _needCreatFile = true;
                 return true;
             }
-            _dataSourceBD = $"Data Source={nameFile}";
+            
             try
             {
                 using SqliteConnection sqlBD = new($"{_dataSourceBD}; mode=ReadWrite");
@@ -84,11 +85,20 @@ namespace test1
                 _logger.LogWarning("Не верные данные пользователя name - {name} phone - {phone}", name, phone);
                 return false;
             }
-            if (_needCreatFile && !TryCreateFile(_nameFile))
+            if (_needCreatFile)
             {
-                return false;
+                if(ValidationInputClass.TryValidatinNameFile(_nameFile) && TryCreateNewTable(_nameFile))
+                {
+                    _needCreatFile = false;
+                    _logger.LogInformation("Создан файл {_nameFile}", _nameFile);
+                }
+                else
+                {
+                    _logger.LogWarning("Была неудачная попытка создать файл {_nameFile}. " +
+                          "Имя файла состоит из запрещённых символов.", _nameFile);
+                    return false;
+                }    
             }
-            _needCreatFile = false;
 
             try
             {
@@ -102,6 +112,7 @@ namespace test1
 
                 sqlBD.Open();
                 commandBDsql.ExecuteNonQuery();
+                _needCreatFile = false;
                 return true;
             }
             catch (SqliteException ex)
@@ -165,22 +176,6 @@ namespace test1
             {
                 _logger.LogError(ex, "ошибка чтения файла {_dataSourceBD} при подсчете количества контактов.", _dataSourceBD);
                 return 0;
-            }
-        }
-
-        public bool TryCreateFile(string nameFile)
-        {
-            if (ValidationInputClass.TryValidatinNameFile(nameFile) &&
-                !File.Exists(nameFile) &&
-                TryCreateNewTable(nameFile))
-            {
-                TryInitializationDB(nameFile);
-                return true;
-            }
-            else
-            {
-                _logger.LogWarning("не удалось создать файл {nameFile}db.", nameFile);
-                return false;
             }
         }
     }

@@ -73,9 +73,5 @@ namespace test1
         {
             return _contacts.Count;
         }
-        public bool TryCreateFile(string nameFile)
-        {
-            return true;
-        }
     }
 }
