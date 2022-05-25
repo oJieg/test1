@@ -52,7 +52,7 @@ namespace test1
             base.ChoiceInput(InputInt, InputKay);
             if (InputKay == ConsoleKey.T)
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 5000; i++)
                 {
                     _dataContacts.TryAddContact($"name{i}", $"phone{i}");
                 }
@@ -65,7 +65,7 @@ namespace test1
 
         private void AddContact()
         {
-            Console.Clear();
+            ClearConsoleOptimazation.Clear();
             Console.WriteLine("1 или пустая строка - отмена ");
             Console.WriteLine("ввидите имя:");
 
@@ -76,7 +76,7 @@ namespace test1
                 {
                     return;
                 }
-                Console.Clear();
+                ClearConsoleOptimazation.Clear();
                 Console.WriteLine("ввидите телефон");
                 string? phone = Console.ReadLine();
 

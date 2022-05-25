@@ -42,7 +42,7 @@ namespace test1
             {
                 Update();
                 FullAmoutOfLines();
-                Console.Clear();
+                ClearConsoleOptimazation.Clear();
                 if (PageCounter)
                 {
                     if (TotalPages == 0)
