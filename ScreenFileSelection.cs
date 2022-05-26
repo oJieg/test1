@@ -132,7 +132,7 @@ namespace test1
 
         private void CreateFile()
         {
-            Console.Clear();
+            ClearConsoleOptimazation.Clear();
             Console.WriteLine("введите имя файла: ");
 
             string nameFile = Console.ReadLine();

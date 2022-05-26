@@ -25,11 +25,11 @@ namespace test1
         public static bool TryValidationForbiddenInputContact(string inputName, string? inputPhone)
         {
             bool correctInput;
-            Regex _validationSeparatorChar = new(";", RegexOptions.Compiled);
-            correctInput = !_validationSeparatorChar.Match(inputName).Success;
-            if (inputPhone != null && correctInput)
+            string charNatCore = ";";
+            correctInput = !inputName.Contains(charNatCore);
+            if (correctInput && !string.IsNullOrEmpty(inputPhone))
             {
-                correctInput = !_validationSeparatorChar.Match(inputPhone).Success;
+                correctInput = !inputPhone.Contains(charNatCore);
             }
             return correctInput;
         }
